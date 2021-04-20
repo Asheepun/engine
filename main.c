@@ -1,44 +1,32 @@
 #include "engine.h"
-#include "stdio.h"
 
-int WIDTH = 1200;
-int HEIGHT = 675;
+int WIDTH = 800;
+int HEIGHT = 450;
 
 void Engine_init(){
-	
-	printf("hello from init function!\n");
-	
+
 	Engine_setWindowSize(WIDTH, HEIGHT);
-	
-	for(int x = 0; x < WIDTH; x++){
-		for(int y = 0; y < HEIGHT; y++){
-		
-			Engine_Pixel *pixel_p = Engine_getScreenPixelPointer(x, y);
-		
-			pixel_p->g = 255;
-		
-		}
-	}
-	
+
 }
 
 void Engine_update(){
-	
-	
+
 }
 
 void Engine_draw(){
-	
-	/*
-	for(int i = 0; i < 100; i++){
-		
-		Engine_Pixel *pixel_p = Engine_getScreenPixelPointer(i, 100);
-		pixel_p->r = 255;
-		pixel_p->g = 255;
-		pixel_p->b = 255;
-		
-		*(unsigned char *)(pixel_p + 3 * sizeof(unsigned char)) = 255;
-		
-	}*/
-	
+
+	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
+
+	Vec2f verts[] = {
+		400, 200,
+		500, 300,
+		300, 300,
+	};
+
+	Engine_drawTriangle(verts, ENGINE_COLORS[COLOR_BLUE]);
+
+}
+
+void Engine_finnish(){
+
 }
