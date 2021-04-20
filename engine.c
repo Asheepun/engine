@@ -1,3 +1,4 @@
+//common includes
 #include "engine.h"
 
 #include "stdio.h"
@@ -5,9 +6,11 @@
 #include "string.h"
 #include "math.h"
 
+//linux includes
 #ifdef __linux__
 #include "time.h"
 #include "unistd.h"
+
 #include "X11/X.h"
 #include "X11/Xlib.h"
 #include "GL/gl.h"
@@ -15,7 +18,10 @@
 #include "GL/glu.h"
 #endif
 
+//windows includes
 #ifdef _WIN32
+#include "time.h"
+
 #include "windows.h"
 #include "wingdi.h"
 #include <GL/gl.h>
@@ -85,7 +91,7 @@ int main(){
 
 	XMapWindow(dpy, win);
 
-	XStoreName(dpy, win, "engine-program");
+	XStoreName(dpy, win, "Untitled Engine Program");
 
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
@@ -145,7 +151,7 @@ int main(){
 
 		endTicks = clock();
 
-		int lag = (endTicks - startTicks);
+		int lag = ticksPerFrame - (endTicks - startTicks);
 
 		if(lag < 0){
 			lag = 0;
@@ -173,7 +179,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	
 	//setup window
-	const char CLASS_NAME[] = "working program";
+	const char CLASS_NAME[] = "Untitled Engine Program";
 	
 	WNDCLASS wc = {};
 	
@@ -186,7 +192,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	hwnd = CreateWindowEx(
 		0,
 		CLASS_NAME,
-		"working program",
+		"Untitled Engine Program",
 		WS_OVERLAPPEDWINDOW,
 
 		CW_USEDEFAULT,
@@ -236,18 +242,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hwnd, nCmdShow);
 	
 	//game loop
-	int currentTime = GetTickCount();
-	int lastTime = currentTime;
-	int deltaTime = 0;
-	int currentFrameTime = 0;
-	
 	while(!QUIT_PROGRAM){
-		
-		lastTime = currentTime;
-		currentTime = GetTickCount();
-		deltaTime = currentTime - lastTime;
-		currentFrameTime += deltaTime;
 	
+		//handle events
 		MSG msg = {};
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
 		
@@ -256,21 +253,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		}
 		
-		if(currentFrameTime >= 1000 / 60){
+		//update
 			
-			currentFrameTime -= 1000 / 60;
-			
-			//update
-			
-			Engine_update();
-			
-		}
+		Engine_update();
 		
 		//draw
 		
 		Engine_draw();
 		
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
+		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_FLOAT, screenPixels);
 		
 		SwapBuffers(hdc);
 		
@@ -300,6 +291,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 //ENGINE FUNCTIONS
 
 //WINDOW FUNCTIONS
+void Engine_setWindowTitle(char *title){
+	
+#ifdef _WIN32
+	SetWindowTextA(hwnd, (LPCSTR)title);
+#endif
+	
+}
+
 void Engine_setWindowSize(int width, int height){
 
 #ifdef __linux__
