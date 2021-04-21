@@ -44,6 +44,58 @@ XEvent xev;
 HWND hwnd;
 #endif
 
+Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];
+
+#ifdef __linux__
+static unsigned int OS_KEY_IDENTIFIERS[] = {
+
+	XK_0,
+	XK_1,
+	XK_2,
+	XK_3,
+	XK_4,
+	XK_5,
+	XK_6,
+	XK_7,
+	XK_8,
+	XK_9,
+
+	XK_A,
+	XK_B,
+	XK_C,
+	XK_D,
+	XK_E,
+	XK_F,
+	XK_G,
+	XK_H,
+	XK_I,
+	XK_J,
+	XK_K,
+	XK_L,
+	XK_M,
+	XK_N,
+	XK_O,
+	XK_P,
+	XK_Q,
+	XK_R,
+	XK_S,
+	XK_T,
+	XK_U,
+	XK_V,
+	XK_W,
+	XK_X,
+	XK_Y,
+	XK_Z,
+
+	//ENGINE_KEY_SPACE,
+	//ENGINE_KEY_ESCAPE,
+	//ENGINE_KEY_BACK_SPACE,
+	//ENGINE_KEY_CTRL,
+	//ENGINE_KEY_ALT,
+
+};
+#endif
+
 //COMMON INITS
 
 void initPixelDrawing(){
@@ -58,6 +110,20 @@ void initPixelDrawing(){
 		}
 	}
 
+}
+
+void initKeys(){
+
+	for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+
+		ENGINE_KEYS[i].OSIdentifier = OS_KEY_IDENTIFIERS[i];
+
+		ENGINE_KEYS[i].down = false;
+		ENGINE_KEYS[i].downed = false;
+		ENGINE_KEYS[i].upped = false;
+	
+	}
+	
 }
 
 //ENGINE ENTRY POINT
@@ -101,6 +167,7 @@ int main(){
 
 	//common inits
 	initPixelDrawing();
+	initKeys();
 
 	Engine_init();
 
@@ -132,6 +199,15 @@ int main(){
 
 				if(xev.xkey.keycode == XKeysymToKeycode(dpy, XK_Q)){
 					quit = true;
+				}
+
+				for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+
+
+					if(xev.xkey.keycode == XKeysymToKeycode(dpy, ENGINE_KEYS[i].OSIdentifier)){
+						ENGINE_KEYS[i].down = true;
+						ENGINE_KEYS[i].downed = true;
+					}
 				}
 			}
 		
@@ -236,6 +312,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//common inits
 	initPixelDrawing();
+	initKeys();
 	
 	Engine_init();
 	

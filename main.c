@@ -16,6 +16,10 @@ void Engine_init(){
 
 void Engine_update(){
 
+	if(ENGINE_KEYS[ENGINE_KEY_G].down){
+		printf("G is down!\n");
+	}
+
 	x += 1;
 
 }
