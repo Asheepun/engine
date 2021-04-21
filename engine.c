@@ -300,6 +300,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 //ENGINE FUNCTIONS
 
 //WINDOW FUNCTIONS
+
+void Engine_setWindowTitle(char *title){
+
+#ifdef __linux__
+	XSetWMName(dpy, win, title);
+#endif
+
+}
+
 void Engine_setWindowSize(int width, int height){
 
 #ifdef __linux__

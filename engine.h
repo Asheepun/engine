@@ -40,6 +40,8 @@ static Engine_Pixel *screenPixels = NULL;
 
 //WINDOW FUNCTIONS
 
+void Engine_setWindowTitle(char *);
+
 void Engine_setWindowSize(int, int);
 
 //DRAWING FUNCTIONS
