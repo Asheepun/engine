@@ -56,20 +56,19 @@ enum Engine_KeyIdentifiers{
 	ENGINE_KEY_Y,
 	ENGINE_KEY_Z,
 
+	ENGINE_KEY_UP,
+	ENGINE_KEY_DOWN,
+	ENGINE_KEY_LEFT,
+	ENGINE_KEY_RIGHT,
+
 	ENGINE_KEY_SPACE,
 	ENGINE_KEY_ESCAPE,
-	//ENGINE_KEY_BACK_SPACE,
-	//ENGINE_KEY_CTRL,
-	//ENGINE_KEY_ALT,
 
 	ENGINE_KEYS_LENGTH,
 
 };
 
 typedef struct Engine_Pixel{
-	//float r;
-	//float g;
-	//float b;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;

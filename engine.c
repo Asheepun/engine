@@ -95,11 +95,65 @@ static unsigned int OS_KEY_IDENTIFIERS[] = {
 	XK_Y,
 	XK_Z,
 
+	XK_Up,
+	XK_Down,
+	XK_Left,
+	XK_Right,
+
 	XK_space,
 	XK_Escape,
-	//ENGINE_KEY_BACK_SPACE,
-	//ENGINE_KEY_CTRL,
-	//ENGINE_KEY_ALT,
+
+};
+#endif
+
+#ifdef _WIN32
+static unsigned int OS_KEY_IDENTIFIERS[] = {
+
+	0x30,
+	0x31,
+	0x32,
+	0x33,
+	0x34,
+	0x35,
+	0x36,
+	0x37,
+	0x38,
+	0x39,
+
+	0x41,
+	0x42,
+	0x43,
+	0x44,
+	0x45,
+	0x46,
+	0x47,
+	0x48,
+	0x49,
+	0x4A,
+	0x4B,
+	0x4C,
+	0x4D,
+	0x4E,
+	0x4F,
+	0x50,
+	0x51,
+	0x52,
+	0x53,
+	0x54,
+	0x55,
+	0x56,
+	0x57,
+	0x58,
+	0x59,
+	0x5A,
+
+	VK_UP,
+	VK_DOWN,
+	VK_LEFT,
+	VK_RIGHT,
+
+	VK_SPACE,
+	VK_ESCAPE,
 
 };
 #endif
@@ -373,7 +427,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		Engine_draw();
 		
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNISNGED_BYTE, screenPixels);
+		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
+
+		resetKeys();
 		
 		SwapBuffers(hdc);
 		
@@ -393,6 +449,33 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 		PostQuitMessage(0);
 		QUIT_PROGRAM = true;
 		return 0;
+	}
+
+	if(uMsg == WM_KEYDOWN){
+		
+		for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+			if(wParam == ENGINE_KEYS[i].OSIdentifier){
+				if(!ENGINE_KEYS[i].down){
+					ENGINE_KEYS[i].downed = true;
+				}
+				ENGINE_KEYS[i].down = true;
+			}
+		}
+
+	}
+
+	if(uMsg == WM_KEYUP){
+		
+		for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+			if(wParam == ENGINE_KEYS[i].OSIdentifier){
+				if(ENGINE_KEYS[i].down){
+					ENGINE_KEYS[i].upped = true;
+				}
+				ENGINE_KEYS[i].down = false;
+			}
+		}
+
+		
 	}
 	
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
