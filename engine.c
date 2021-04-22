@@ -13,6 +13,7 @@
 
 #include "X11/X.h"
 #include "X11/Xlib.h"
+#include "X11/XKBlib.h"
 #include "GL/gl.h"
 #include "GL/glx.h"
 #include "GL/glu.h"
@@ -126,6 +127,13 @@ void initKeys(){
 	
 }
 
+void resetKeys(){
+	for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+		ENGINE_KEYS[i].downed = false;
+		ENGINE_KEYS[i].upped = false;
+	}
+}
+
 //ENGINE ENTRY POINT
 
 #ifdef __linux__
@@ -165,6 +173,9 @@ int main(){
 	Atom wmDelete = XInternAtom(dpy, "WM_DELETE_WINDOW", true);
 	XSetWMProtocols(dpy, win, &wmDelete, 1);
 
+	int autoRepeatIsAvailable;
+	XkbSetDetectableAutoRepeat(dpy, true, &autoRepeatIsAvailable);
+
 	//common inits
 	initPixelDrawing();
 	initKeys();
@@ -202,13 +213,26 @@ int main(){
 				}
 
 				for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
-
-
 					if(xev.xkey.keycode == XKeysymToKeycode(dpy, ENGINE_KEYS[i].OSIdentifier)){
+						if(!ENGINE_KEYS[i].down){
+							ENGINE_KEYS[i].downed = true;
+						}
 						ENGINE_KEYS[i].down = true;
-						ENGINE_KEYS[i].downed = true;
 					}
 				}
+			}
+
+			if(xev.type == KeyRelease){
+
+				for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
+					if(xev.xkey.keycode == XKeysymToKeycode(dpy, ENGINE_KEYS[i].OSIdentifier)){
+						if(ENGINE_KEYS[i].down){
+							ENGINE_KEYS[i].upped = true;
+						}
+						ENGINE_KEYS[i].down = false;
+					}
+				}
+
 			}
 		
 		}
@@ -224,6 +248,8 @@ int main(){
 		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
 		glXSwapBuffers(dpy, win);
+
+		resetKeys();
 
 		endTicks = clock();
 
@@ -241,6 +267,8 @@ int main(){
 	}
 
 	Engine_finnish();
+
+	printf("GOT HERE!\n");
 
 	return 0;
 
