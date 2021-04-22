@@ -26,7 +26,7 @@ void Engine_update(){
 
 void Engine_draw(){
 
-	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
+	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_RED);
 
 	Vec2f verts[] = {
 		400, 200,

@@ -65,9 +65,12 @@ enum Engine_KeyIdentifiers{
 };
 
 typedef struct Engine_Pixel{
-	float r;
-	float g;
-	float b;
+	//float r;
+	//float g;
+	//float b;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 }Engine_Pixel;
 
 typedef struct Engine_Key{
@@ -80,11 +83,11 @@ typedef struct Engine_Key{
 }Engine_Key;
 
 static Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
-	1, 1, 1,
+	255, 255, 255,
 	0, 0, 0,
-	1, 0, 0,
-	0, 1, 0,
-	0, 0, 1,
+	255, 0, 0,
+	0, 255, 0,
+	0, 0, 255,
 };
 
 extern Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];

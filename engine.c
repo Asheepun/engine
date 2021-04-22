@@ -221,7 +221,7 @@ int main(){
 
 		Engine_draw();
 
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_FLOAT, screenPixels);
+		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
 		glXSwapBuffers(dpy, win);
 
@@ -338,7 +338,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		Engine_draw();
 		
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_FLOAT, screenPixels);
+		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNISNGED_BYTE, screenPixels);
 		
 		SwapBuffers(hdc);
 		
