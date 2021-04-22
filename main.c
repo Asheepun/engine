@@ -16,14 +16,8 @@ void Engine_init(){
 
 void Engine_update(){
 
-	if(ENGINE_KEYS[ENGINE_KEY_G].downed){
-		printf("G is downed!\n");
-	}
-	if(ENGINE_KEYS[ENGINE_KEY_G].down){
-		printf("G is down!\n");
-	}
-	if(ENGINE_KEYS[ENGINE_KEY_G].upped){
-		printf("G is upped!\n");
+	if(ENGINE_KEYS[ENGINE_KEY_ESCAPE].down){
+		printf("IT IS DOWN!\n");
 	}
 
 	x += 1;

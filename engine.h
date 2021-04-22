@@ -5,6 +5,8 @@
 #include "stdbool.h"
 #include "geometry.h"
 
+#define COLOR_BUFFER_SIZE 1920
+
 enum Engine_ColorEnum{
 	COLOR_WHITE,
 	COLOR_BLACK,
@@ -54,8 +56,8 @@ enum Engine_KeyIdentifiers{
 	ENGINE_KEY_Y,
 	ENGINE_KEY_Z,
 
-	//ENGINE_KEY_SPACE,
-	//ENGINE_KEY_ESCAPE,
+	ENGINE_KEY_SPACE,
+	ENGINE_KEY_ESCAPE,
 	//ENGINE_KEY_BACK_SPACE,
 	//ENGINE_KEY_CTRL,
 	//ENGINE_KEY_ALT,
@@ -90,15 +92,14 @@ static Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
 	0, 0, 255,
 };
 
+//GLOBAL VARIABLE DECLARTIONS
 extern Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];
+extern Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
 
-#define COLOR_BUFFER_SIZE 1920
-static Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
+extern int screenWidth;
+extern int screenHeight;
 
-static int screenWidth = 800;
-static int screenHeight = 450;
-
-static Engine_Pixel *screenPixels = NULL;
+extern Engine_Pixel *screenPixels;
 
 //ENGINE FUNCTIONS
 

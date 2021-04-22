@@ -45,6 +45,13 @@ XEvent xev;
 HWND hwnd;
 #endif
 
+//GLOBAL VARIABLE DEFINITIONS
+
+Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
+int screenWidth = 800;
+int screenHeight = 450;
+Engine_Pixel *screenPixels = NULL;
+
 Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];
 
 #ifdef __linux__
@@ -88,8 +95,8 @@ static unsigned int OS_KEY_IDENTIFIERS[] = {
 	XK_Y,
 	XK_Z,
 
-	//ENGINE_KEY_SPACE,
-	//ENGINE_KEY_ESCAPE,
+	XK_space,
+	XK_Escape,
 	//ENGINE_KEY_BACK_SPACE,
 	//ENGINE_KEY_CTRL,
 	//ENGINE_KEY_ALT,
