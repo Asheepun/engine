@@ -329,8 +329,6 @@ int main(){
 
 	Engine_finnish();
 
-	printf("GOT HERE!\n");
-
 	return 0;
 
 }
@@ -512,8 +510,8 @@ void Engine_setWindowSize(int width, int height){
 }
 
 //DRAWING FUNCTIONS
-Engine_Pixel *Engine_getScreenPixelPointer(int x, int y){
-	return screenPixels + x + (screenHeight - y - 1) * screenWidth;
+unsigned int Engine_getScreenPixelIndex(int x, int y){
+	return x + (screenHeight - y - 1) * screenWidth;
 }
 
 void Engine_fillRect(int x, int y, int w, int h, enum Engine_ColorEnum color){
@@ -542,7 +540,8 @@ void Engine_fillRect(int x, int y, int w, int h, enum Engine_ColorEnum color){
 
 	for(int i = 0; i < h; i++){
 
-		Engine_Pixel *pixel_p = Engine_getScreenPixelPointer(x, y + i);
+		unsigned int index = Engine_getScreenPixelIndex(x, y + i);
+		Engine_Pixel *pixel_p = &screenPixels[index];
 
 		memcpy(pixel_p, colorBuffers[color], w * sizeof(Engine_Pixel));
 
@@ -562,7 +561,8 @@ void Engine_drawLine(Vec2f p1, Vec2f p2, Engine_Pixel color){
 
 	for(int i = 0; i < length; i++){
 
-		Engine_Pixel *pixel_p = Engine_getScreenPixelPointer(round(pos.x), round(pos.y));
+		unsigned int index = Engine_getScreenPixelIndex(pos.x, pos.y);
+		Engine_Pixel *pixel_p = &screenPixels[index];
 
 		*pixel_p = color;
 		

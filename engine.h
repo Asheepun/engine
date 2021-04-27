@@ -110,7 +110,7 @@ void Engine_setWindowSize(int, int);
 
 //DRAWING FUNCTIONS
 
-Engine_Pixel *Engine_getScreenPixelPointer(int, int);
+unsigned int Engine_getScreenPixelIndex(int, int);
 
 void Engine_fillRect(int, int, int, int, enum Engine_ColorEnum);
 

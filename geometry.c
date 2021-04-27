@@ -57,6 +57,10 @@ float Vec2f_getMag(Vec2f v){
 	return sqrt(v.x * v.x + v.y * v.y);
 }
 
+float getDistanceBetweenVec2fAndVec2f(Vec2f v1, Vec2f v2){
+	return sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
+}
+
 Vec2f Vec2f_getInverse(Vec2f v){
 	return getVec2f(1 / v.x, 1 / v.y);
 }
