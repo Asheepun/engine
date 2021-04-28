@@ -141,6 +141,40 @@ Vec3f Vec3f_getCross(Vec3f v1, Vec3f v2){
 	return result;
 }
 
+void Vec3f_rotate(Vec3f *point, float rotX, float rotY, float rotZ){
+
+	//x axis
+	float mag = sqrt(point->y * point->y + point->z * point->z);
+
+	float deg = atan2(point->z, point->y);
+
+	deg += rotX;
+
+	point->y = mag * cos(deg);
+	point->z = mag * sin(deg);
+
+	//y axis
+	mag = sqrt(point->x * point->x + point->z * point->z);
+
+	deg = atan2(point->x, point->z);
+
+	deg += rotY;
+
+	point->x = mag * sin(deg);
+	point->z = mag * cos(deg);
+
+	//z axis
+	mag = sqrt(point->x * point->x + point->y * point->y);
+
+	deg = atan2(point->y, point->x);
+
+	deg += rotZ;
+
+	point->x = mag * cos(deg);
+	point->y = mag * sin(deg);
+
+}
+
 Vec4f getVec4f(float x, float y, float z, float w){
 	Vec4f v = { x, y, z, w };
 	return v;
@@ -152,6 +186,7 @@ Vec4f Vec3f_getVec4f(Vec3f v){
 	return newVector;
 }
 
+/*
 void Vec3f_rotate(Vec3f *v, float x, float y, float z){
 	Vec4f newVector = Vec3f_getVec4f(*v);
 
@@ -166,6 +201,7 @@ void Vec3f_rotate(Vec3f *v, float x, float y, float z){
 	v->z = newVector.z;
 
 }
+*/
 
 void Vec4f_set(Vec4f *v, float x, float y, float z, float w){
 	v->x = x;

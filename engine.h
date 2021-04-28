@@ -10,6 +10,7 @@
 enum Engine_ColorEnum{
 	COLOR_WHITE,
 	COLOR_BLACK,
+	COLOR_GREY,
 	COLOR_RED,
 	COLOR_GREEN,
 	COLOR_BLUE,
@@ -86,6 +87,7 @@ typedef struct Engine_Key{
 static Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
 	255, 255, 255,
 	0, 0, 0,
+	127, 127, 127,
 	255, 0, 0,
 	0, 255, 0,
 	0, 0, 255,

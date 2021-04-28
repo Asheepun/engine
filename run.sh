@@ -1,1 +1,1 @@
-gcc *.c -ldl -lm -lGL -lX11 -o main && ./main
+gcc *.c -g -ldl -lm -lGL -lX11 -o main && ./main

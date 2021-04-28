@@ -9,17 +9,26 @@ int HEIGHT = 450;
 float fov = M_PI / 4;
 
 Vec3f triangleVerts[] = {
-	-1, -1, 5,
-	1, -1, 5,
-	-1, 1, 5,
 
-	-1, 1, 5,
-	1, 1, 5,
-	1, -1, 5,
+	1, -1, 0,
+	-1, -1, 0,
+	-1, 1, 0,
+
+	-1, 1, 0,
+	1, 1, 0,
+	1, -1, 0,
 
 };
 
 unsigned int triangleVertsLength = 2;
+
+int paperWidth = 400;
+int paperHeight = 560;
+
+Vec3f rotation = { 1.7 * -M_PI / 4, 1 * -M_PI / 4, -0.1 };
+Vec3f pos = { 0, 0.5, 4.5 };
+
+float time = 0;
 
 void Engine_init(){
 
@@ -32,16 +41,23 @@ void Engine_init(){
 
 void Engine_update(){
 
+	time += 1;
+
+	//pos.x = cos(time * 0.05) * 3;
+
+	//pos.y = sin(time * 0.05) * 4;
+
+	//rotation.z += 0.1;
+	//rotation.x += 0.01;
+	//rotation.y += 0.01;
 
 }
-
-float time = 0;
 
 void Engine_draw(){
 
 	printf("---\n");
 
-	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
+	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_GREY);
 
 	for(int i = 0; i < triangleVertsLength; i++){
 
@@ -50,6 +66,20 @@ void Engine_draw(){
 			triangleVerts[i * 3 + 1],
 			triangleVerts[i * 3 + 2],
 		};
+
+		for(int j = 0; j < 3; j++){
+
+			verts3d[j].y *= (float)paperHeight / (float)paperWidth;
+
+			Vec3f_mul(&verts3d[j], 1.1);
+
+			Vec3f_rotate(&verts3d[j], rotation.x, rotation.y, rotation.z);
+
+			Vec3f_add(&verts3d[j], &pos);
+
+			verts3d[j].x *= (float)HEIGHT / (float)WIDTH;
+
+		}
 
 		Vec2f verts2d[3];
 
@@ -98,13 +128,21 @@ void Engine_draw(){
 			int xLeft = (x1 < x2) * x1 + (x2 < x1) * x2;
 			int xRight = (x1 > x2) * x1 + (x2 > x1) * x2;
 
+			xLeft = !(xLeft < 0) * xLeft;
+			xRight = !(xRight > WIDTH) * xRight + (xRight > WIDTH) * WIDTH;
+
+			if(y < 0
+			|| y >= HEIGHT){
+				continue;
+			}
+
 			int width = xRight - xLeft;
 
 			for(int j = 0; j < width; j++){
 
 				unsigned int index = Engine_getScreenPixelIndex(xLeft + j, y);
 				
-				screenPixels[index] = ENGINE_COLORS[COLOR_BLUE];
+				screenPixels[index] = ENGINE_COLORS[COLOR_WHITE];
 			
 			}
 			
@@ -120,17 +158,28 @@ void Engine_draw(){
 			int xLeft = (x1 < x2) * x1 + (x2 < x1) * x2;
 			int xRight = (x1 > x2) * x1 + (x2 > x1) * x2;
 
+			xLeft = !(xLeft < 0) * xLeft;
+			xRight = !(xRight > WIDTH) * xRight + (xRight > WIDTH) * WIDTH;
+
+			if(y < 0
+			|| y >= HEIGHT){
+				continue;
+			}
+
 			int width = xRight - xLeft;
 
 			for(int j = 0; j < width; j++){
 
 				unsigned int index = Engine_getScreenPixelIndex(xLeft + j, y);
 				
-				screenPixels[index] = ENGINE_COLORS[COLOR_BLUE];
+				screenPixels[index] = ENGINE_COLORS[COLOR_WHITE];
 			
 			}
 		
 		}
+
+		Engine_drawLine(verts2d[0], verts2d[1], ENGINE_COLORS[COLOR_BLACK]);
+		Engine_drawLine(verts2d[1], verts2d[2], ENGINE_COLORS[COLOR_BLACK]);
 	
 	}
 
