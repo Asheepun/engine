@@ -187,3 +187,23 @@ Vec3f getMulVec3fFloat(Vec3f v, float a){
 Vec3f getDivVec3fFloat(Vec3f v, float a){
 	return getVec3f(v.x / a, v.y / a, v.z / a);
 }
+
+Vec3f getCrossVec3f(Vec3f v1, Vec3f v2){
+	Vec3f v = {
+		v1.y * v2.z - v1.z * v2.y,
+		v1.z * v2.x - v1.x * v2.z,
+		v1.x * v2.y - v1.y * v2.x,
+	};
+
+	return v;
+}
+
+float getAngleBetweenVec3f(Vec3f v1, Vec3f v2){
+
+	float a = getMagVec3f(getSubVec3f(v1, v2));
+	float b = getMagVec3f(v1);
+	float c = getMagVec3f(v2);
+
+	return acos((a * a - b * b - c * c) / -2 / b / c);
+
+}

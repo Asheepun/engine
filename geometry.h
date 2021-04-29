@@ -80,4 +80,8 @@ Vec3f getMulVec3fFloat(Vec3f, float);
 
 Vec3f getDivVec3fFloat(Vec3f, float);
 
+Vec3f getCrossVec3f(Vec3f, Vec3f);
+
+float getAngleBetweenVec3f(Vec3f, Vec3f);
+
 #endif

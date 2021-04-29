@@ -55,8 +55,6 @@ void Engine_update(){
 
 void Engine_draw(){
 
-	printf("---\n");
-
 	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_GREY);
 
 	for(int i = 0; i < triangleVertsLength; i++){
