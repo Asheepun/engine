@@ -71,11 +71,11 @@ void Engine_draw(){
 
 			verts3d[j].y *= (float)paperHeight / (float)paperWidth;
 
-			Vec3f_mul(&verts3d[j], 1.1);
+			Vec3f_mulByFloat(&verts3d[j], 1.1);
 
 			Vec3f_rotate(&verts3d[j], rotation.x, rotation.y, rotation.z);
 
-			Vec3f_add(&verts3d[j], &pos);
+			Vec3f_add(&verts3d[j], pos);
 
 			verts3d[j].x *= (float)HEIGHT / (float)WIDTH;
 

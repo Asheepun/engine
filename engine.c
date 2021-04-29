@@ -551,9 +551,9 @@ void Engine_fillRect(int x, int y, int w, int h, enum Engine_ColorEnum color){
 void Engine_drawLine(Vec2f p1, Vec2f p2, Engine_Pixel color){
 	
 	Vec2f diff = p1;
-	Vec2f_sub(&diff, &p2);
+	Vec2f_sub(&diff, p2);
 	
-	int length = Vec2f_getMag(diff);
+	int length = getMagVec2f(diff);
 
 	Vec2f_normalize(&diff);
 		
