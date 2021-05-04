@@ -134,6 +134,12 @@ void Vec3f_normalize(Vec3f *v){
 	Vec3f_divByFloat(v, getMagVec3f(*v));
 }
 
+void Vec3f_inverse(Vec3f *v){
+	v->x *= -1;
+	v->y *= -1;
+	v->z *= -1;
+}
+
 void Vec3f_rotate(Vec3f *point, float rotX, float rotY, float rotZ){
 
 	//x axis
@@ -188,6 +194,10 @@ Vec3f getDivVec3fFloat(Vec3f v, float a){
 	return getVec3f(v.x / a, v.y / a, v.z / a);
 }
 
+float getDistanceVec3f(Vec3f v1, Vec3f v2){
+	return getMagVec3f(getSubVec3f(v1, v2));
+}
+
 Vec3f getCrossVec3f(Vec3f v1, Vec3f v2){
 	Vec3f v = {
 		v1.y * v2.z - v1.z * v2.y,
@@ -199,11 +209,72 @@ Vec3f getCrossVec3f(Vec3f v1, Vec3f v2){
 }
 
 float getAngleBetweenVec3f(Vec3f v1, Vec3f v2){
-
 	float a = getMagVec3f(getSubVec3f(v1, v2));
 	float b = getMagVec3f(v1);
 	float c = getMagVec3f(v2);
 
 	return acos((a * a - b * b - c * c) / -2 / b / c);
+}
+
+Vec3f getNormalFromTriangleVec3f(Vec3f v1, Vec3f v2, Vec3f v3){
+	Vec3f N = getCrossVec3f(getSubVec3f(v2, v1), getSubVec3f(v3, v1));
+
+	Vec3f_normalize(&N);
+
+	return N;
+}
+
+int test = 0;
+
+//ONLY WORKS IF l1 IS 0, 0, 0 MUST FIX!!!
+Vec3f getLineToTriangleIntersectionVec3f(Vec3f l1, Vec3f l2, Vec3f v1, Vec3f v2, Vec3f v3){
+
+	Vec3f O = l1;
+	Vec3f P = v1;
+
+	Vec3f dl = getSubVec3f(l2, O);
+
+	Vec3f N = getNormalFromTriangleVec3f(v1, v2, v3);
+
+	float a1 = getAngleBetweenVec3f(getSubVec3f(N, O), getSubVec3f(P, O));
+
+	if(a1 > M_PI / 2){
+		a1 = M_PI - a1;
+		Vec3f_inverse(&N);
+	}
+
+	Vec3f_mulByFloat(&N, getDistanceVec3f(O, P) * cos(a1));
+
+	float a2 = getAngleBetweenVec3f(dl, N);
+
+	if(a2 > M_PI / 2){
+		a2 = M_PI - a2;
+		Vec3f_inverse(&dl);
+	}
+
+	Vec3f_normalize(&dl);
+	Vec3f_mulByFloat(&dl, getMagVec3f(N) / cos(a2));
+
+	if(test % 1000 == 0){
+
+		/*
+		printf("---GETINTERSECTIONCALL---\n");
+
+		printf("a1: %f\n", a1);
+		printf("a2: %f\n", a2);
+
+		Vec3f_log(O);
+		Vec3f_log(dl);
+
+		Vec3f_log(getAddVec3f(O, dl));
+		*/
+	
+	}
+
+	test++;
+
+	return getAddVec3f(O, dl);
 
 }
+
+

@@ -68,6 +68,8 @@ void Vec3f_divByFloat(Vec3f *, float);
 
 void Vec3f_normalize(Vec3f *);
 
+void Vec3f_inverse(Vec3f *);
+
 void Vec3f_rotate(Vec3f *, float, float, float);
 
 float getMagVec3f(Vec3f);
@@ -80,8 +82,14 @@ Vec3f getMulVec3fFloat(Vec3f, float);
 
 Vec3f getDivVec3fFloat(Vec3f, float);
 
+float getDistanceVec3f(Vec3f, Vec3f);
+
 Vec3f getCrossVec3f(Vec3f, Vec3f);
 
 float getAngleBetweenVec3f(Vec3f, Vec3f);
+
+Vec3f getNormalFromTriangleVec3f(Vec3f, Vec3f, Vec3f);
+
+Vec3f getLineToTriangleIntersectionVec3f(Vec3f, Vec3f, Vec3f, Vec3f, Vec3f);
 
 #endif
