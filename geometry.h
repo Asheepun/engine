@@ -86,6 +86,8 @@ Vec3f getDivVec3fFloat(Vec3f, float);
 
 float getDistanceVec3f(Vec3f, Vec3f);
 
+float getDotVec3f(Vec3f, Vec3f);
+
 Vec3f getCrossVec3f(Vec3f, Vec3f);
 
 float getAngleBetweenVec3f(Vec3f, Vec3f);

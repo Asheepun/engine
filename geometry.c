@@ -202,6 +202,10 @@ float getDistanceVec3f(Vec3f v1, Vec3f v2){
 	return getMagVec3f(getSubVec3f(v1, v2));
 }
 
+float getDotVec3f(Vec3f v1, Vec3f v2){
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
 Vec3f getCrossVec3f(Vec3f v1, Vec3f v2){
 	Vec3f v = {
 		v1.y * v2.z - v1.z * v2.y,
@@ -217,7 +221,7 @@ float getAngleBetweenVec3f(Vec3f v1, Vec3f v2){
 	float b = getMagVec3f(v1);
 	float c = getMagVec3f(v2);
 
-	return acos((a * a - b * b - c * c) / -2 / b / c);
+	return acos((a * a - b * b - c * c) / (-2 * b * c));
 }
 
 float getAreaFromTriangleVec3f(Vec3f v1, Vec3f v2, Vec3f v3){
