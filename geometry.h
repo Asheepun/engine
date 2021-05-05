@@ -15,6 +15,8 @@ typedef struct Vec3f{
 //GENERAL MATH FUNCTIONS
 float normalize(float);
 
+float getSquare(float);
+
 float getRandom();
 
 //VEC2F FUNCTIONS
@@ -87,6 +89,8 @@ float getDistanceVec3f(Vec3f, Vec3f);
 Vec3f getCrossVec3f(Vec3f, Vec3f);
 
 float getAngleBetweenVec3f(Vec3f, Vec3f);
+
+float getAreaFromTriangleVec3f(Vec3f, Vec3f, Vec3f);
 
 Vec3f getNormalFromTriangleVec3f(Vec3f, Vec3f, Vec3f);
 

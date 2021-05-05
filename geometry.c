@@ -8,6 +8,10 @@ float normalize(float x){
 	return x / fabs(x);
 }
 
+float getSquare(float x){
+	return x * x;
+}
+
 int ___x = 1;
 int ___a = 65521;
 int ___c = 0;
@@ -214,6 +218,14 @@ float getAngleBetweenVec3f(Vec3f v1, Vec3f v2){
 	float c = getMagVec3f(v2);
 
 	return acos((a * a - b * b - c * c) / -2 / b / c);
+}
+
+float getAreaFromTriangleVec3f(Vec3f v1, Vec3f v2, Vec3f v3){
+	float a = getMagVec3f(getSubVec3f(v1, v2));
+	float b = getMagVec3f(getSubVec3f(v1, v3));
+	float c = getMagVec3f(getSubVec3f(v2, v3));
+
+	return (b * c / 2) * sqrt(1 - getSquare((b * b + c * c - a * a) / (2 * b * c)));
 }
 
 Vec3f getNormalFromTriangleVec3f(Vec3f v1, Vec3f v2, Vec3f v3){

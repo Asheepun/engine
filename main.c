@@ -24,7 +24,19 @@ Vec3f triangleVerts[] = {
 
 };
 
+Vec2f textureVerts[] = {
+	
+	0.5, 1,
+	0.0, 0,
+	1.0, 0,
+
+};
+
 unsigned int triangleVertsLength = 1;
+unsigned int textureVertsLength = 1;
+
+int textureWidth = 100;
+int textureHeight = 100;
 
 int paperWidth = 400;
 int paperHeight = 560;
@@ -62,7 +74,7 @@ void Engine_update(){
 
 	//rotation.z += 0.1;
 	//rotation.x += 0.01;
-	rotation.y += 0.02;
+	//rotation.y += 0.02;
 
 }
 
@@ -140,6 +152,8 @@ void Engine_draw(){
 
 		Vec3f P1 = getVec3f(0, 0, 0);
 
+		float area = getAreaFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
+
 		for(int i = 0; i < yMid.y - yMin.y; i++){
 
 			int y = yMin.y + i;
@@ -165,6 +179,12 @@ void Engine_draw(){
 				Vec3f P2 = getVec3f(2 * (xLeft + j) / (float)WIDTH - 1, 2 * y / (float)HEIGHT - 1, screenZ);
 
 				Vec3f I = getLineToTriangleIntersectionVec3f(P1, P2, verts3d[0], verts3d[1], verts3d[2]);
+
+				float area0 = getAreaFromTriangleVec3f(I, verts3d[1], verts3d[2]) / area;
+				float area1 = getAreaFromTriangleVec3f(I, verts3d[0], verts3d[2]) / area;
+				float area2 = getAreaFromTriangleVec3f(I, verts3d[0], verts3d[1]) / area;
+
+				Vec2f texturePos = textureVerts[0] * area0 + textureVerts[1] * area1 + textureVerts[2] * area2;
 
 				unsigned int index = Engine_getScreenPixelIndex(xLeft + j, y);
 				
