@@ -39,6 +39,20 @@ float screenSize = 2;
 
 float time = 0;
 
+void shader(int screenX, int screenY, int screenPixelIndex, Vec3f point){
+
+	Engine_Pixel pixel = ENGINE_COLORS[COLOR_BLUE];
+
+	float dist = getMagVec3f(getSubVec3f(point, lightPos));
+
+	pixel.r = 255 * pow(0.5, dist);
+	pixel.g = 255 * pow(0.5, dist);
+	pixel.b = 255 * pow(0.5, dist);
+	
+	screenPixels[screenPixelIndex] = pixel;
+
+}
+
 void Engine_init(){
 
 	Engine_setWindowSize(WIDTH, HEIGHT);
@@ -58,7 +72,7 @@ void Engine_update(){
 
 	//pos.z = 7 + cos(time * 0.05) * 4;
 
-	//pos.y = sin(time * 0.05) * 4;
+	//pos.y = sin(time * 0.01) * 3;
 
 	//rotation.z += 0.1;
 	//rotation.x += 0.01;
@@ -138,7 +152,13 @@ void Engine_draw(){
 		Vec2f yMid = sortedVerts2d[1];
 		Vec2f yMin = sortedVerts2d[2];
 
-		Vec3f P1 = getVec3f(0, 0, 0);
+		Vec3f O = getVec3f(0, 0, 0);
+		Vec3f TP = verts3d[0];
+
+		Vec3f N = getNormalFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
+		if(N.z < 0){
+			Vec3f_inverse(&N);
+		}
 
 		for(int i = 0; i < yMid.y - yMin.y; i++){
 
@@ -160,21 +180,15 @@ void Engine_draw(){
 
 			int width = xRight - xLeft;
 
+			int index = Engine_getScreenPixelIndex(xLeft, y);
+
 			for(int j = 0; j < width; j++){
 
-				Vec3f P2 = getVec3f(2 * (xLeft + j) / (float)WIDTH - 1, 2 * y / (float)HEIGHT - 1, screenZ);
+				Vec3f SP = getVec3f(2 * (xLeft + j) / (float)WIDTH - 1, 2 * y / (float)HEIGHT - 1, screenZ);
 
-				Vec3f I = getLineToTriangleIntersectionVec3f(P1, P2, verts3d[0], verts3d[1], verts3d[2]);
+				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				unsigned int index = Engine_getScreenPixelIndex(xLeft + j, y);
-				
-				screenPixels[index] = ENGINE_COLORS[COLOR_WHITE];
-
-				Vec3f diff = getSubVec3f(I, lightPos);
-
-				screenPixels[index].r = 255 * pow(0.50, getMagVec3f(diff));
-				screenPixels[index].g = 255 * pow(0.50, getMagVec3f(diff));
-				screenPixels[index].b = 255 * pow(0.50, getMagVec3f(diff));
+				shader(xLeft + j, y, index + j, SP);
 			
 			}
 			
@@ -200,29 +214,19 @@ void Engine_draw(){
 
 			int width = xRight - xLeft;
 
+			unsigned int index = Engine_getScreenPixelIndex(xLeft, y);
+
 			for(int j = 0; j < width; j++){
 
-				Vec3f P2 = getVec3f(2 * (xLeft + j) / (float)WIDTH - 1, 2 * y / (float)HEIGHT - 1, screenZ);
+				Vec3f SP = getVec3f(2 * (xLeft + j) / (float)WIDTH - 1, 2 * y / (float)HEIGHT - 1, screenZ);
 
-				Vec3f I = getLineToTriangleIntersectionVec3f(P1, P2, verts3d[0], verts3d[1], verts3d[2]);
+				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				unsigned int index = Engine_getScreenPixelIndex(xLeft + j, y);
-				
-				screenPixels[index] = ENGINE_COLORS[COLOR_WHITE];
+				shader(xLeft + j, y, index + j, SP);
 
-				Vec3f diff = getSubVec3f(I, lightPos);
-
-				screenPixels[index].r = 255 * pow(0.50, getMagVec3f(diff));
-				screenPixels[index].g = 255 * pow(0.50, getMagVec3f(diff));
-				screenPixels[index].b = 255 * pow(0.50, getMagVec3f(diff));
-			
-			
 			}
 		
 		}
-
-		//Engine_drawLine(verts2d[0], verts2d[1], ENGINE_COLORS[COLOR_BLACK]);
-		//Engine_drawLine(verts2d[1], verts2d[2], ENGINE_COLORS[COLOR_BLACK]);
 	
 	}
 
