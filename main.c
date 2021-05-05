@@ -2,6 +2,8 @@
 #include "stdio.h"
 #include "math.h"
 #include "string.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 int WIDTH = 800;
 int HEIGHT = 450;
@@ -26,17 +28,17 @@ Vec3f triangleVerts[] = {
 
 Vec2f textureVerts[] = {
 	
-	0.5, 1,
-	0.0, 0,
-	1.0, 0,
+	0.5, 0,
+	1.0, 1,
+	0.0, 1,
 
 };
 
 unsigned int triangleVertsLength = 1;
 unsigned int textureVertsLength = 1;
 
-int textureWidth = 100;
-int textureHeight = 100;
+int textureWidth = 0;
+int textureHeight = 0;
 
 int paperWidth = 400;
 int paperHeight = 560;
@@ -49,16 +51,31 @@ Vec3f lightPos = { 0, 0, -10 };
 float screenZ = 2;
 float screenSize = 2;
 
-float ambient = 0.3;
-float diffuse = 0.5;
+float ambient = 0.2;
+float diffuse = 0.6;
 
-Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
+//Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
 
 float time = 0;
 
-void shader(int screenX, int screenY, int screenPixelIndex, Vec3f point, Vec3f normal){
+Engine_Pixel *textureData;
 
-	Vec3f L = getSubVec3f(lightPos, point);
+unsigned int getTextureIndex(int x, int y){
+	return y * textureWidth + x;
+}
+
+int tmpTest = 0;
+
+void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int texturePosY, Vec3f intersectionPoint, Vec3f normal){
+
+	tmpTest++;
+	//if(tmpTest % 1000 == 0){
+		//printf("%i, %i\n", texturePosX, texturePosY);
+	//}
+
+	Engine_Pixel color = textureData[texturePosY * textureWidth + texturePosX];
+
+	Vec3f L = getSubVec3f(lightPos, intersectionPoint);
 	Vec3f_normalize(&L);
 
 	float dot = getDotVec3f(L, normal);
@@ -70,12 +87,6 @@ void shader(int screenX, int screenY, int screenPixelIndex, Vec3f point, Vec3f n
 		ambient * color.b + dot * diffuse * color.b,
 	};
 
-	//float dist = getMagVec3f(getSubVec3f(point, lightPos));
-
-	//pixel.r = 255 * pow(0.5, dist);
-	//pixel.g = 255 * pow(0.5, dist);
-	//pixel.b = 255 * pow(0.5, dist);
-	
 	screenPixels[screenPixelIndex] = pixel;
 
 }
@@ -85,6 +96,9 @@ void Engine_init(){
 	Engine_setWindowSize(WIDTH, HEIGHT);
 	
 	Engine_setWindowTitle("My cool program");
+
+	int channels;
+	textureData = (Engine_Pixel *)stbi_load("testtexture.png", &textureWidth, &textureHeight, &channels, 3);
 
 }
 
@@ -103,7 +117,7 @@ void Engine_update(){
 
 	//rotation.z += 0.1;
 	//rotation.x += 0.01;
-	//rotation.y += 0.02;
+	rotation.y += 0.02;
 
 }
 
@@ -219,7 +233,20 @@ void Engine_draw(){
 
 				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				shader(xLeft + j, y, index + j, SP, normal);
+				float area0 = getAreaFromTriangleVec3f(SP, verts3d[1], verts3d[2]);
+				float area1 = getAreaFromTriangleVec3f(SP, verts3d[0], verts3d[2]);
+				float area2 = getAreaFromTriangleVec3f(SP, verts3d[0], verts3d[1]);
+
+				float areaSum = area0 + area1 + area2;
+
+				area0 = area0 / areaSum;
+				area1 = area1 / areaSum;
+				area2 = area2 / areaSum;
+
+				int texturePosX = textureWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
+				int texturePosY = textureHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
+
+				shader(xLeft + j, y, index + j, texturePosX, texturePosY, SP, normal);
 			
 			}
 			
@@ -253,7 +280,20 @@ void Engine_draw(){
 
 				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				shader(xLeft + j, y, index + j, SP, normal);
+				float area0 = getAreaFromTriangleVec3f(SP, verts3d[1], verts3d[2]);
+				float area1 = getAreaFromTriangleVec3f(SP, verts3d[0], verts3d[2]);
+				float area2 = getAreaFromTriangleVec3f(SP, verts3d[0], verts3d[1]);
+
+				float areaSum = area0 + area1 + area2;
+
+				area0 = area0 / areaSum;
+				area1 = area1 / areaSum;
+				area2 = area2 / areaSum;
+
+				int texturePosX = textureWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
+				int texturePosY = textureHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
+
+				shader(xLeft + j, y, index + j, texturePosX, texturePosY, SP, normal);
 
 			}
 		
