@@ -84,7 +84,7 @@ typedef struct Engine_Key{
 	bool upped;
 }Engine_Key;
 
-static Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
+static const Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
 	255, 255, 255,
 	0, 0, 0,
 	127, 127, 127,

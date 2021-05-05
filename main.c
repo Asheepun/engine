@@ -32,22 +32,37 @@ int paperHeight = 560;
 Vec3f rotation = { 0, 0, 0};
 Vec3f pos = { 0, 0, 4 };
 
-Vec3f lightPos = { 2, 2, 4 };
+Vec3f lightPos = { 0, 0, -10 };
 
 float screenZ = 2;
 float screenSize = 2;
 
+float ambient = 0.3;
+float diffuse = 0.5;
+
+Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
+
 float time = 0;
 
-void shader(int screenX, int screenY, int screenPixelIndex, Vec3f point){
+void shader(int screenX, int screenY, int screenPixelIndex, Vec3f point, Vec3f normal){
 
-	Engine_Pixel pixel = ENGINE_COLORS[COLOR_BLUE];
+	Vec3f L = getSubVec3f(lightPos, point);
+	Vec3f_normalize(&L);
 
-	float dist = getMagVec3f(getSubVec3f(point, lightPos));
+	float dot = getDotVec3f(L, normal);
+	dot = (dot < 0) * -dot + (dot > 0) * dot;
 
-	pixel.r = 255 * pow(0.5, dist);
-	pixel.g = 255 * pow(0.5, dist);
-	pixel.b = 255 * pow(0.5, dist);
+	Engine_Pixel pixel = { 
+		ambient * color.r + dot * diffuse * color.r,
+		ambient * color.g + dot * diffuse * color.g,
+		ambient * color.b + dot * diffuse * color.b,
+	};
+
+	//float dist = getMagVec3f(getSubVec3f(point, lightPos));
+
+	//pixel.r = 255 * pow(0.5, dist);
+	//pixel.g = 255 * pow(0.5, dist);
+	//pixel.b = 255 * pow(0.5, dist);
 	
 	screenPixels[screenPixelIndex] = pixel;
 
@@ -65,8 +80,8 @@ void Engine_update(){
 
 	time += 1;
 
-	lightPos.x = cos(time * 0.05) * 1.5;
-	lightPos.y = sin(time * 0.05) * 1.5;
+	//lightPos.x = cos(time * 0.05) * 1.5;
+	//lightPos.y = sin(time * 0.05) * 1.5;
 
 	//triangleVerts[2].z = 2 + sin(time * 0.05) * 2;
 
@@ -82,7 +97,7 @@ void Engine_update(){
 
 void Engine_draw(){
 
-	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_GREY);
+	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
 
 	for(int i = 0; i < triangleVertsLength; i++){
 
@@ -156,6 +171,8 @@ void Engine_draw(){
 		Vec3f TP = verts3d[0];
 
 		Vec3f N = getNormalFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
+		Vec3f normal = N;
+
 		if(N.z < 0){
 			Vec3f_inverse(&N);
 		}
@@ -188,7 +205,7 @@ void Engine_draw(){
 
 				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				shader(xLeft + j, y, index + j, SP);
+				shader(xLeft + j, y, index + j, SP, normal);
 			
 			}
 			
@@ -222,7 +239,7 @@ void Engine_draw(){
 
 				Vec3f_mulByFloat(&SP, getDotVec3f(N, TP) / getDotVec3f(N, SP));
 
-				shader(xLeft + j, y, index + j, SP);
+				shader(xLeft + j, y, index + j, SP, normal);
 
 			}
 		
