@@ -12,9 +12,9 @@ float fov = M_PI / 2;
 
 Vec3f triangleVerts[] = {
 
-	0, -1, 0,
-	-1, 1, 0,
-	1, 1, 0,
+	//0, -1, 0,
+	//-1, 1, 0,
+	//1, 1, 0,
 
 	1, -1, 0,
 	-1, -1, 0,
@@ -26,16 +26,20 @@ Vec3f triangleVerts[] = {
 
 };
 
-Vec2f textureVerts[] = {
+Vec2f triangleTextureVerts[] = {
 	
-	0.5, 0,
-	1.0, 1,
-	0.0, 1,
+	1.0, 0.0,
+	0.0, 0.0,
+	0.0, 1.0,
+
+	0.0, 1.0,
+	1.0, 1.0,
+	1.0, 0.0,
 
 };
 
-unsigned int triangleVertsLength = 1;
-unsigned int textureVertsLength = 1;
+unsigned int triangleVertsLength = 2;
+//unsigned int textureVertsLength = 1;
 
 int textureWidth = 0;
 int textureHeight = 0;
@@ -128,9 +132,15 @@ void Engine_draw(){
 	for(int i = 0; i < triangleVertsLength; i++){
 
 		Vec3f verts3d[] = {
-			triangleVerts[i * 3],
+			triangleVerts[i * 3 + 0],
 			triangleVerts[i * 3 + 1],
 			triangleVerts[i * 3 + 2],
+		};
+
+		Vec2f textureVerts[] = {
+			triangleTextureVerts[i * 3 + 0],
+			triangleTextureVerts[i * 3 + 1],
+			triangleTextureVerts[i * 3 + 2],
 		};
 
 		bool clip = false;
@@ -205,15 +215,17 @@ void Engine_draw(){
 
 		float area = getAreaFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
 
-		for(int i = 0; i < yMid.y - yMin.y; i++){
+		int height = ceil(yMid.y - yMin.y);
 
-			int y = yMin.y + i;
+		for(int i = 0; i < height; i++){
 
-			int x1 = yMin.x	+ i * (yMin.x - yMax.x) / (yMin.y - yMax.y);
-			int x2 = yMin.x	+ i * (yMin.x - yMid.x) / (yMin.y - yMid.y);
+			int y = floor(yMin.y) + i;
 
-			int xLeft = (x1 < x2) * x1 + (x2 < x1) * x2;
-			int xRight = (x1 > x2) * x1 + (x2 > x1) * x2;
+			float x1 = yMin.x + i * (yMin.x - yMax.x) / (yMin.y - yMax.y);
+			float x2 = yMin.x + i * (yMin.x - yMid.x) / (yMin.y - yMid.y);
+
+			int xLeft = floor((x1 < x2) * x1 + (x2 < x1) * x2);
+			int xRight = ceil((x1 > x2) * x1 + (x2 > x1) * x2);
 
 			xLeft = !(xLeft < 0) * xLeft;
 			xRight = !(xRight > WIDTH) * xRight + (xRight > WIDTH) * WIDTH;
@@ -252,15 +264,17 @@ void Engine_draw(){
 			
 		}
 
-		for(int i = 0; i < yMax.y - yMid.y; i++){
+		height = ceil(yMax.y - yMid.y);
 
-			int y = yMax.y - i;
+		for(int i = 0; i < height; i++){
 
-			int x1 = yMax.x - i * (yMin.x - yMax.x) / (yMin.y - yMax.y);
-			int x2 = yMax.x - i * (yMid.x - yMax.x) / (yMid.y - yMax.y);
+			int y = floor(yMax.y) - i;
 
-			int xLeft = (x1 < x2) * x1 + (x2 < x1) * x2;
-			int xRight = (x1 > x2) * x1 + (x2 > x1) * x2;
+			float x1 = yMax.x - i * (yMin.x - yMax.x) / (yMin.y - yMax.y);
+			float x2 = yMax.x - i * (yMid.x - yMax.x) / (yMid.y - yMax.y);
+
+			int xLeft = floor((x1 < x2) * x1 + (x2 < x1) * x2);
+			int xRight = ceil((x1 > x2) * x1 + (x2 > x1) * x2);
 
 			xLeft = !(xLeft < 0) * xLeft;
 			xRight = !(xRight > WIDTH) * xRight + (xRight > WIDTH) * WIDTH;
