@@ -5,50 +5,40 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+typedef struct Fold{
+	float pos;
+	float angle;
+}Fold;
+
 int WIDTH = 800;
 int HEIGHT = 450;
 
 float fov = M_PI / 2;
 
-Vec3f triangleVerts[] = {
+Vec3f triangleVerts[6];
+Vec2f triangleTextureVerts[6];
 
-	//0, -1, 0,
-	//-1, 1, 0,
-	//1, 1, 0,
-
-	1, -1, 0,
-	-1, -1, 0,
-	-1, 1, 0,
-
-	-1, 1, 0,
-	1, 1, 0,
-	1, -1, 0,
-
-};
-
-Vec2f triangleTextureVerts[] = {
+int triangleIndices[] = {
 	
-	1.0, 0.0,
-	0.0, 0.0,
-	0.0, 1.0,
+	0, 1, 2,
+	3, 2, 1,
 
-	0.0, 1.0,
-	1.0, 1.0,
-	1.0, 0.0,
+	2, 3, 4,
+	5, 4, 3,
 
 };
 
-unsigned int triangleVertsLength = 2;
-//unsigned int textureVertsLength = 1;
+int triangleIndicesLength = 4;
 
 int textureWidth = 0;
 int textureHeight = 0;
 
-int paperWidth = 400;
-int paperHeight = 560;
+int paperWidth = 50;
+int paperHeight = 70;
 
 Vec3f rotation = { 0, 0, 0};
-Vec3f pos = { 0, 0, 4 };
+Vec3f pos = { 0, 0, 5 };
+float scale = 2;
 
 Vec3f lightPos = { 0, 0, -10 };
 
@@ -58,8 +48,6 @@ float screenSize = 2;
 float ambient = 0.2;
 float diffuse = 0.6;
 
-//Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
-
 float time = 0;
 
 Engine_Pixel *textureData;
@@ -68,16 +56,10 @@ unsigned int getTextureIndex(int x, int y){
 	return y * textureWidth + x;
 }
 
-int tmpTest = 0;
+void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int texturePosY, int textureStartIndex, Vec3f intersectionPoint, Vec3f normal){
 
-void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int texturePosY, Vec3f intersectionPoint, Vec3f normal){
-
-	tmpTest++;
-	//if(tmpTest % 1000 == 0){
-		//printf("%i, %i\n", texturePosX, texturePosY);
-	//}
-
-	Engine_Pixel color = textureData[texturePosY * textureWidth + texturePosX];
+	Engine_Pixel color = textureData[texturePosY * textureWidth + texturePosX + textureStartIndex];
+	//Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
 
 	Vec3f L = getSubVec3f(lightPos, intersectionPoint);
 	Vec3f_normalize(&L);
@@ -102,7 +84,8 @@ void Engine_init(){
 	Engine_setWindowTitle("My cool program");
 
 	int channels;
-	textureData = (Engine_Pixel *)stbi_load("testtexture.png", &textureWidth, &textureHeight, &channels, 3);
+	textureData = (Engine_Pixel *)stbi_load("level-1.png", &textureWidth, &textureHeight, &channels, 3);
+
 
 }
 
@@ -119,9 +102,29 @@ void Engine_update(){
 
 	//pos.y = sin(time * 0.01) * 3;
 
-	//rotation.z += 0.1;
-	rotation.x += 0.01;
-	rotation.y += 0.02;
+	//rotation.z += 0.02;
+	//rotation.x += 0.02;
+	//rotation.y += 0.02;
+	rotation.y = M_PI / 4;
+
+	//generate verts
+	float foldPos = 0;
+	float afterFoldWidth = 0.7 - foldPos;
+	float foldAngle = M_PI / 2 + M_PI / 1.5 * sin(time * 0.05);
+
+	triangleVerts[0] = getVec3f(-0.5, -0.7, 0);
+	triangleVerts[1] = getVec3f(0.5, -0.7, 0);
+	triangleVerts[2] = getVec3f(-0.5, foldPos, 0);
+	triangleVerts[3] = getVec3f(0.5, foldPos, 0);
+	triangleVerts[4] = getVec3f(-0.5, foldPos + afterFoldWidth * sin(foldAngle), afterFoldWidth * cos(foldAngle));
+	triangleVerts[5] = getVec3f(0.5, foldPos + afterFoldWidth * sin(foldAngle), afterFoldWidth * cos(foldAngle));
+
+	triangleTextureVerts[0] = getVec2f(0.0, 0.0);
+	triangleTextureVerts[1] = getVec2f(1.0, 0.0);
+	triangleTextureVerts[2] = getVec2f(0.0, (foldPos + 0.7) / 1.4);
+	triangleTextureVerts[3] = getVec2f(1.0, (foldPos + 0.7) / 1.4);
+	triangleTextureVerts[4] = getVec2f(0.0, 1.0);
+	triangleTextureVerts[5] = getVec2f(1.0, 1.0);
 
 }
 
@@ -129,33 +132,31 @@ void Engine_draw(){
 
 	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
 
-	for(int i = 0; i < triangleVertsLength; i++){
+	for(int i = 0; i < triangleIndicesLength; i++){
 
 		Vec3f verts3d[] = {
-			triangleVerts[i * 3 + 0],
-			triangleVerts[i * 3 + 1],
-			triangleVerts[i * 3 + 2],
+			triangleVerts[triangleIndices[i * 3 + 0]],
+			triangleVerts[triangleIndices[i * 3 + 1]],
+			triangleVerts[triangleIndices[i * 3 + 2]],
 		};
 
 		Vec2f textureVerts[] = {
-			triangleTextureVerts[i * 3 + 0],
-			triangleTextureVerts[i * 3 + 1],
-			triangleTextureVerts[i * 3 + 2],
+			triangleTextureVerts[triangleIndices[i * 3 + 0]],
+			triangleTextureVerts[triangleIndices[i * 3 + 1]],
+			triangleTextureVerts[triangleIndices[i * 3 + 2]],
 		};
 
 		bool clip = false;
 
 		for(int j = 0; j < 3; j++){
 
-			//verts3d[j].y *= (float)paperHeight / (float)paperWidth;
-
-			//Vec3f_mulByFloat(&verts3d[j], 1.1);
+			Vec3f_mulByFloat(&verts3d[j], scale);
 
 			Vec3f_rotate(&verts3d[j], rotation.x, rotation.y, rotation.z);
 
 			Vec3f_add(&verts3d[j], pos);
 
-			//verts3d[j].x *= (float)HEIGHT / (float)WIDTH;
+			verts3d[j].x *= (float)HEIGHT / (float)WIDTH;
 
 			if(verts3d[j].z <= screenZ){
 				clip = true;
@@ -215,6 +216,8 @@ void Engine_draw(){
 
 		float area = getAreaFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
 
+		int textureStartIndex = 0 + (normal.z < 0) * paperWidth * paperHeight;
+
 		int height = ceil(yMid.y - yMin.y);
 
 		for(int i = 0; i < height; i++){
@@ -255,10 +258,10 @@ void Engine_draw(){
 				area1 = area1 / areaSum;
 				area2 = area2 / areaSum;
 
-				int texturePosX = textureWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
-				int texturePosY = textureHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
+				int texturePosX = paperWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
+				int texturePosY = paperHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
 
-				shader(xLeft + j, y, index + j, texturePosX, texturePosY, SP, normal);
+				shader(xLeft + j, y, index + j, texturePosX, texturePosY, textureStartIndex, SP, normal);
 			
 			}
 			
@@ -304,10 +307,10 @@ void Engine_draw(){
 				area1 = area1 / areaSum;
 				area2 = area2 / areaSum;
 
-				int texturePosX = textureWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
-				int texturePosY = textureHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
+				int texturePosX = paperWidth * (textureVerts[0].x * area0 + textureVerts[1].x * area1 + textureVerts[2].x * area2);
+				int texturePosY = paperHeight * (textureVerts[0].y * area0 + textureVerts[1].y * area1 + textureVerts[2].y * area2);
 
-				shader(xLeft + j, y, index + j, texturePosX, texturePosY, SP, normal);
+				shader(xLeft + j, y, index + j, texturePosX, texturePosY, textureStartIndex, SP, normal);
 
 			}
 		
