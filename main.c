@@ -116,7 +116,7 @@ void Engine_update(){
 	//pos.y = sin(time * 0.01) * 3;
 
 	//rotation.z += 0.1;
-	//rotation.x += 0.01;
+	rotation.x += 0.01;
 	rotation.y += 0.02;
 
 }
