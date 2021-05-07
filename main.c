@@ -13,6 +13,8 @@ typedef struct Fold{
 int WIDTH = 800;
 int HEIGHT = 450;
 
+float *depthBuffer;
+
 float fov = M_PI / 2;
 
 Vec3f triangleVerts[6];
@@ -58,8 +60,14 @@ unsigned int getTextureIndex(int x, int y){
 
 void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int texturePosY, int textureStartIndex, Vec3f intersectionPoint, Vec3f normal){
 
+	unsigned int thisIsTheClosestPoint = (
+		depthBuffer[screenPixelIndex] == 0
+		|| getMagVec3f(intersectionPoint) < depthBuffer[screenPixelIndex]
+	);
+
+	depthBuffer[screenPixelIndex] = (thisIsTheClosestPoint) * getMagVec3f(intersectionPoint) + (!thisIsTheClosestPoint) * depthBuffer[screenPixelIndex];
+
 	Engine_Pixel color = textureData[texturePosY * textureWidth + texturePosX + textureStartIndex];
-	//Engine_Pixel color = ENGINE_COLORS[COLOR_BLUE];
 
 	Vec3f L = getSubVec3f(lightPos, intersectionPoint);
 	Vec3f_normalize(&L);
@@ -73,7 +81,9 @@ void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int
 		ambient * color.b + dot * diffuse * color.b,
 	};
 
-	screenPixels[screenPixelIndex] = pixel;
+	screenPixels[screenPixelIndex].r = (thisIsTheClosestPoint) * pixel.r + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].r;
+	screenPixels[screenPixelIndex].g = (thisIsTheClosestPoint) * pixel.g + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].g;
+	screenPixels[screenPixelIndex].b = (thisIsTheClosestPoint) * pixel.b + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].b;
 
 }
 
@@ -86,6 +96,7 @@ void Engine_init(){
 	int channels;
 	textureData = (Engine_Pixel *)stbi_load("level-1.png", &textureWidth, &textureHeight, &channels, 3);
 
+	depthBuffer = malloc(sizeof(float) * WIDTH * HEIGHT);
 
 }
 
@@ -104,8 +115,8 @@ void Engine_update(){
 
 	//rotation.z += 0.02;
 	//rotation.x += 0.02;
-	//rotation.y += 0.02;
-	rotation.y = M_PI / 4;
+	rotation.y += 0.01;
+	//rotation.y = M_PI / 4;
 
 	//generate verts
 	float foldPos = 0;
@@ -129,6 +140,8 @@ void Engine_update(){
 }
 
 void Engine_draw(){
+
+	memset(depthBuffer, 0, sizeof(float) * WIDTH * HEIGHT);
 
 	Engine_fillRect(0, 0, screenWidth, screenHeight, COLOR_BLACK);
 
