@@ -60,12 +60,12 @@ unsigned int getTextureIndex(int x, int y){
 
 void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int texturePosY, int textureStartIndex, Vec3f intersectionPoint, Vec3f normal){
 
-	unsigned int thisIsTheClosestPoint = (
-		depthBuffer[screenPixelIndex] == 0
-		|| getMagVec3f(intersectionPoint) < depthBuffer[screenPixelIndex]
-	);
+	if(depthBuffer[screenPixelIndex] != 0
+	&& depthBuffer[screenPixelIndex] < getMagVec3f(intersectionPoint)){
+		return;
+	}
 
-	depthBuffer[screenPixelIndex] = (thisIsTheClosestPoint) * getMagVec3f(intersectionPoint) + (!thisIsTheClosestPoint) * depthBuffer[screenPixelIndex];
+	depthBuffer[screenPixelIndex] = getMagVec3f(intersectionPoint);
 
 	Engine_Pixel color = textureData[texturePosY * textureWidth + texturePosX + textureStartIndex];
 
@@ -81,9 +81,7 @@ void shader(int screenX, int screenY, int screenPixelIndex, int texturePosX, int
 		ambient * color.b + dot * diffuse * color.b,
 	};
 
-	screenPixels[screenPixelIndex].r = (thisIsTheClosestPoint) * pixel.r + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].r;
-	screenPixels[screenPixelIndex].g = (thisIsTheClosestPoint) * pixel.g + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].g;
-	screenPixels[screenPixelIndex].b = (thisIsTheClosestPoint) * pixel.b + (!thisIsTheClosestPoint) * screenPixels[screenPixelIndex].b;
+	screenPixels[screenPixelIndex] = pixel;
 
 }
 
