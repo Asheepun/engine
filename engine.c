@@ -499,7 +499,7 @@ void Engine_setWindowSize(int width, int height){
 #endif
 
 #ifdef _WIN32
-	SetWindowPos(hwnd, NULL, 0, 0, width, height, SWP_SHOWWINDOW);
+	SetWindowPos(hwnd, NULL, GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2, GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2, width, height, SWP_SHOWWINDOW);
 #endif
 
 	screenWidth = width;

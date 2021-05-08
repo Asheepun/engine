@@ -42,6 +42,8 @@ Vec3f rotation = { 0, 0, 0};
 Vec3f pos = { 0, 0, 5 };
 float scale = 2;
 
+float foldPos = 0.7;
+
 Vec3f lightPos = { 0, 0, -10 };
 
 float screenZ = 2;
@@ -113,25 +115,31 @@ void Engine_update(){
 
 	//rotation.z += 0.02;
 	//rotation.x += 0.02;
-	rotation.y += 0.01;
+	//rotation.y += 0.01;
 	//rotation.y = M_PI / 4;
 
-	//generate verts
-	float foldPos = 0;
-	float afterFoldWidth = 0.7 - foldPos;
-	float foldAngle = M_PI / 2 + M_PI / 1.5 * sin(time * 0.05);
+	pos.y = 0.7;
 
-	triangleVerts[0] = getVec3f(-0.5, -0.7, 0);
-	triangleVerts[1] = getVec3f(0.5, -0.7, 0);
-	triangleVerts[2] = getVec3f(-0.5, foldPos, 0);
-	triangleVerts[3] = getVec3f(0.5, foldPos, 0);
-	triangleVerts[4] = getVec3f(-0.5, foldPos + afterFoldWidth * sin(foldAngle), afterFoldWidth * cos(foldAngle));
-	triangleVerts[5] = getVec3f(0.5, foldPos + afterFoldWidth * sin(foldAngle), afterFoldWidth * cos(foldAngle));
+	rotation.x = -M_PI / 2.5;
+	rotation.y = -M_PI / 4;
+
+	lightPos.z = 5;
+	lightPos.y = -5;
+
+	//generate verts
+	float foldAngle = M_PI / 2;// + M_PI / 1 * sin(time * 0.05);
+
+	triangleVerts[0] = getVec3f(-0.5, (foldPos - 0.7) -foldPos * sin(foldAngle), foldPos * cos(foldAngle));
+	triangleVerts[1] = getVec3f(0.5, (foldPos - 0.7) -foldPos * sin(foldAngle), foldPos * cos(foldAngle));
+	triangleVerts[2] = getVec3f(-0.5, foldPos - 0.7, 0);
+	triangleVerts[3] = getVec3f(0.5, foldPos - 0.7, 0);
+	triangleVerts[4] = getVec3f(-0.5, 0.7, 0);
+	triangleVerts[5] = getVec3f(0.5, 0.7, 0);
 
 	triangleTextureVerts[0] = getVec2f(0.0, 0.0);
 	triangleTextureVerts[1] = getVec2f(1.0, 0.0);
-	triangleTextureVerts[2] = getVec2f(0.0, (foldPos + 0.7) / 1.4);
-	triangleTextureVerts[3] = getVec2f(1.0, (foldPos + 0.7) / 1.4);
+	triangleTextureVerts[2] = getVec2f(0.0, foldPos / 1.4);
+	triangleTextureVerts[3] = getVec2f(1.0, foldPos / 1.4);
 	triangleTextureVerts[4] = getVec2f(0.0, 1.0);
 	triangleTextureVerts[5] = getVec2f(1.0, 1.0);
 
@@ -227,7 +235,7 @@ void Engine_draw(){
 
 		float area = getAreaFromTriangleVec3f(verts3d[0], verts3d[1], verts3d[2]);
 
-		int textureStartIndex = 0 + (normal.z < 0) * paperWidth * paperHeight;
+		int textureStartIndex = 0 + (getDotVec3f(normal, TP) < 0) * paperWidth * paperHeight;
 
 		int height = ceil(yMid.y - yMin.y);
 
