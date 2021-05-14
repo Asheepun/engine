@@ -110,6 +110,8 @@ void Engine_setWindowTitle(char *);
 
 void Engine_setWindowSize(int, int);
 
+void Engine_centerWindow();
+
 //DRAWING FUNCTIONS
 
 unsigned int Engine_getScreenPixelIndex(int, int);

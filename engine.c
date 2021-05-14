@@ -30,6 +30,7 @@
 
 #ifdef __linux__
 Display *dpy;
+int screenNumber;
 Window root;
 GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
 XVisualInfo *vi;
@@ -209,6 +210,7 @@ int main(){
 	}
 
 	root = DefaultRootWindow(dpy);
+	screenNumber = DefaultScreen(dpy);
 
 	vi = glXChooseVisual(dpy, 0, att);
 
@@ -233,6 +235,7 @@ int main(){
 
 	Atom wmDelete = XInternAtom(dpy, "WM_DELETE_WINDOW", true);
 	XSetWMProtocols(dpy, win, &wmDelete, 1);
+
 
 	int autoRepeatIsAvailable;
 	XkbSetDetectableAutoRepeat(dpy, true, &autoRepeatIsAvailable);
@@ -506,6 +509,14 @@ void Engine_setWindowSize(int width, int height){
 	screenHeight = height;
 
 	screenPixels = malloc(sizeof(Engine_Pixel) * width * height);
+
+}
+
+void Engine_centerWindow(){
+
+#ifdef __linux__
+	XMoveWindow(dpy, win, DisplayWidth(dpy, screenNumber) / 2 - screenWidth / 2, DisplayHeight(dpy, screenNumber) / 2 - screenHeight / 2);
+#endif
 
 }
 
