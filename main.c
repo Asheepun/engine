@@ -79,7 +79,7 @@ unsigned int VBO;
 int WIDTH = 480;
 int HEIGHT = 270;
 
-int width = 200;
+int width = 100;
 int height = 100;
 
 float posX = 100;
@@ -124,9 +124,7 @@ void Engine_init(){
 	//load texture
 
 	int textureWidth, textureHeight, channels;
-	unsigned char *textureData = stbi_load("testtexture.png", &textureWidth, &textureHeight, &channels, 4);
-
-	printf("%i\n", channels);
+	unsigned char *textureData = stbi_load("6.jpg", &textureWidth, &textureHeight, &channels, 4);
 
 	glGenTextures(1, &texture);
 
@@ -185,6 +183,19 @@ void Engine_draw(){
 
 	glEnableVertexAttribArray(vertexPositionAttributeLocation);
 	glEnableVertexAttribArray(textureVertexAttributeLocation);
+
+	unsigned int posXUniformLocation = glGetUniformLocation(shaderProgram, "posX");
+	unsigned int posYUniformLocation = glGetUniformLocation(shaderProgram, "posY");
+	unsigned int widthUniformLocation = glGetUniformLocation(shaderProgram, "width");
+	unsigned int heightUniformLocation = glGetUniformLocation(shaderProgram, "height");
+
+	//printf("%f\n", (float)(posX - WIDTH / 2) / (float)WIDTH);
+
+	glUniform1f(posXUniformLocation, (float)(posX * 2) / (float)WIDTH);
+	glUniform1f(posYUniformLocation, (float)(posY * 2) / (float)HEIGHT);
+	glUniform1f(widthUniformLocation, (float)width / (float)WIDTH);
+	glUniform1f(heightUniformLocation, (float)height / (float)HEIGHT);
+
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
