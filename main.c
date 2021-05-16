@@ -8,6 +8,7 @@
 #include "glad/glad.h"
 
 unsigned int shaderProgram;
+unsigned int texture;
 
 char *readFile_mustFree(char *filePath){
 
@@ -23,10 +24,6 @@ char *readFile_mustFree(char *filePath){
 	while((c = fgetc(fd)) != EOF){
 		buffer[fileLength] = c;
 		fileLength++;
-	}
-
-	for(int i = fileLength; i < 1024; i++){
-		//buffer[i] = "\o";
 	}
 	
 	fclose(fd);
@@ -58,16 +55,25 @@ unsigned int getCompiledShader(char *shaderSourcePath, GLenum type){
 }
 
 float rectangleVertices[] = {
-	1, 1,
-	-1, 1,
-	-1, -1,
+	1, 1, 1, 0,
+	-1, 1, 0, 0,
+	-1, -1, 0, 1,
 
-	1, 1,
-	1, -1,
-	-1, -1,
+	1, 1, 1, 0,
+	1, -1, 1, 1,
+	-1, -1, 0, 1,
 };
 
-unsigned int VAO;
+float textureVertices[] = {
+	1, 1,
+	0, 1,
+	0, 0,
+
+	1, 1,
+	1, 0,
+	0, 0,
+};
+
 unsigned int VBO;
 
 int WIDTH = 480;
@@ -93,12 +99,15 @@ void Engine_init(){
 
 	printf("%s\n", glGetString(GL_VERSION));
 
+	//generate buffer
+
 	glGenBuffers(1, &VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
 
+	//compile and link shaders
 	unsigned int vertexShader = getCompiledShader("shaders/vertex-shader.glsl", GL_VERTEX_SHADER);
 
 	unsigned int fragmentShader = getCompiledShader("shaders/fragment-shader.glsl", GL_FRAGMENT_SHADER);
@@ -111,6 +120,27 @@ void Engine_init(){
 	glBindFragDataLocation(shaderProgram, 0, "outColor");
 
 	glLinkProgram(shaderProgram);
+
+	//load texture
+
+	int textureWidth, textureHeight, channels;
+	unsigned char *textureData = stbi_load("testtexture.png", &textureWidth, &textureHeight, &channels, 4);
+
+	printf("%i\n", channels);
+
+	glGenTextures(1, &texture);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
@@ -138,17 +168,23 @@ void Engine_draw(){
 
 	glViewport(0, 0, screenWidth, screenHeight);
 
-	glClearColor(0, 0, 0, 1.0);
+	glClearColor(0.5, 0.5, 0.5, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(shaderProgram);
 
-	unsigned int aPosAttributeLocation = glGetAttribLocation(shaderProgram, "aPos");
-	
-	glVertexAttribPointer(aPosAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
-	glEnableVertexAttribArray(aPosAttributeLocation);
+	unsigned int vertexPositionAttributeLocation = glGetAttribLocation(shaderProgram, "vertexPosition");
+	unsigned int textureVertexAttributeLocation = glGetAttribLocation(shaderProgram, "textureVertex");
+	
+	glVertexAttribPointer(vertexPositionAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glVertexAttribPointer(textureVertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+
+	glEnableVertexAttribArray(vertexPositionAttributeLocation);
+	glEnableVertexAttribArray(textureVertexAttributeLocation);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
