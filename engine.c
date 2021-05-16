@@ -6,6 +6,8 @@
 #include "string.h"
 #include "math.h"
 
+#include "glad/glad.h"
+
 //linux includes
 #ifdef __linux__
 #include "time.h"
@@ -14,9 +16,7 @@
 #include "X11/X.h"
 #include "X11/Xlib.h"
 #include "X11/XKBlib.h"
-#include "GL/gl.h"
 #include "GL/glx.h"
-#include "GL/glu.h"
 #endif
 
 //windows includes
@@ -25,7 +25,6 @@
 
 #include "windows.h"
 #include "wingdi.h"
-#include <GL/gl.h>
 #endif
 
 #ifdef __linux__
@@ -233,9 +232,10 @@ int main(){
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
 
+	gladLoadGL();
+
 	Atom wmDelete = XInternAtom(dpy, "WM_DELETE_WINDOW", true);
 	XSetWMProtocols(dpy, win, &wmDelete, 1);
-
 
 	int autoRepeatIsAvailable;
 	XkbSetDetectableAutoRepeat(dpy, true, &autoRepeatIsAvailable);
@@ -309,7 +309,7 @@ int main(){
 
 		Engine_draw();
 
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
+		//glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
 		glXSwapBuffers(dpy, win);
 

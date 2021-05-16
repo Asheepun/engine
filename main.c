@@ -5,18 +5,84 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "glad/glad.h"
+
+unsigned int shaderProgram;
+
+char *readFile_mustFree(char *filePath){
+
+	char *buffer = malloc(sizeof(char) * 1024);
+	FILE *fd = NULL;
+	long fileLength = 0;
+
+	memset(buffer, 0, 1024);
+
+	fd = fopen(filePath, "r");
+
+	char c;
+	while((c = fgetc(fd)) != EOF){
+		buffer[fileLength] = c;
+		fileLength++;
+	}
+
+	for(int i = fileLength; i < 1024; i++){
+		//buffer[i] = "\o";
+	}
+	
+	fclose(fd);
+
+	return buffer;
+
+}
+
+unsigned int getCompiledShader(char *shaderSourcePath, GLenum type){
+	char *shaderSource = readFile_mustFree(shaderSourcePath);
+
+	unsigned int shader;
+	shader = glCreateShader(type);
+
+	glShaderSource(shader, 1, (const GLchar * const *)&shaderSource, NULL);
+	glCompileShader(shader);
+
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if(!success){
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
+		printf("FAILED TO COMPILE SHADER: %s\n%s\n", shaderSourcePath, infoLog);
+	}
+
+	free(shaderSource);
+
+	return shader;
+}
+
+float rectangleVertices[] = {
+	1, 1,
+	-1, 1,
+	-1, -1,
+
+	1, 1,
+	1, -1,
+	-1, -1,
+};
+
+unsigned int VAO;
+unsigned int VBO;
+
 int WIDTH = 480;
 int HEIGHT = 270;
-
-int textureWidth, textureHeight, channels;
-
-unsigned char *textureData;
 
 int width = 200;
 int height = 100;
 
-int posX = 100;
-int posY = 100;
+float posX = 100;
+float posY = 100;
+
+float velocityX = 0;
+float velocityY = 0;
+
+float speedX = 2;
 
 int scale = 2;
 
@@ -25,48 +91,66 @@ void Engine_init(){
 	Engine_setWindowSize(WIDTH * 2.5, HEIGHT * 2.5);
 	Engine_centerWindow();
 
-	textureData = stbi_load("testtexture.png", &textureWidth, &textureHeight, &channels, 4);
+	printf("%s\n", glGetString(GL_VERSION));
+
+	glGenBuffers(1, &VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+
+	unsigned int vertexShader = getCompiledShader("shaders/vertex-shader.glsl", GL_VERTEX_SHADER);
+
+	unsigned int fragmentShader = getCompiledShader("shaders/fragment-shader.glsl", GL_FRAGMENT_SHADER);
+
+	shaderProgram = glCreateProgram();
+
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+
+	glBindFragDataLocation(shaderProgram, 0, "outColor");
+
+	glLinkProgram(shaderProgram);
 
 }
 
 void Engine_update(){
 
+	if(ENGINE_KEYS[ENGINE_KEY_D].down){
+		velocityX = speedX;
+	}
+	if(ENGINE_KEYS[ENGINE_KEY_A].down){
+		velocityX = -speedX;
+	}
+	if(ENGINE_KEYS[ENGINE_KEY_A].down && ENGINE_KEYS[ENGINE_KEY_D].down
+	|| !ENGINE_KEYS[ENGINE_KEY_A].down && !ENGINE_KEYS[ENGINE_KEY_D].down){
+		velocityX = 0;
+	}
 
-	//posX += 2;
-	//posY += 2;
+	//velocityY = 1;
+
+	posX += velocityX;
+	posY += velocityY;
 
 }
 
 void Engine_draw(){
 
-	Engine_fillRect(0, 0, WIDTH * scale, HEIGHT * scale, COLOR_BLACK);
+	glViewport(0, 0, screenWidth, screenHeight);
 
-	float textureScaleX = (float)textureWidth / (float)width;
-	float textureScaleY = (float)textureHeight / (float)height;
+	glClearColor(0, 0, 0, 1.0);
 
-	for(int i = 0; i < height; i++){
-		for(int j = 0; j < width * scale; j++){
+	glClear(GL_COLOR_BUFFER_BIT);
 
-			unsigned int index = Engine_getScreenPixelIndex(posX * scale + j, posY * scale + i * scale);
+	glUseProgram(shaderProgram);
 
-			unsigned int textureIndex = 4 * (int)((int)(i * textureScaleY) * textureWidth + (int)(j / scale * textureScaleX)) + 3;
+	unsigned int aPosAttributeLocation = glGetAttribLocation(shaderProgram, "aPos");
+	
+	glVertexAttribPointer(aPosAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-			if(textureData[textureIndex] > 0){
-				screenPixels[index] = ENGINE_COLORS[COLOR_GREEN];
-			}
-		
-		}
-	}
+	glEnableVertexAttribArray(aPosAttributeLocation);
 
-	for(int i = 0; i < HEIGHT; i++){
-		for(int j = 1; j < scale; j++){
-
-			unsigned int index = Engine_getScreenPixelIndex(0, i * scale);
-
-			memcpy(screenPixels + index + j * screenWidth, screenPixels + index, sizeof(Engine_Pixel) * screenWidth);
-			
-		}
-	}
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 }
 
