@@ -5,7 +5,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "text.h"
+
 #include "glad/glad.h"
+
+Font font;
 
 char *readFile_mustFree(char *filePath){
 
@@ -59,6 +63,8 @@ enum Renderer2D_ShaderTypeEnum{
 typedef struct Renderer2D_Texture{
 	char *name;
 	unsigned int ID;
+	int width;
+	int height;
 }Renderer2D_Texture;
 
 typedef struct Renderer2D_ShaderProgram{
@@ -70,12 +76,15 @@ typedef struct Renderer2D{
 	int width;
 	int height;
 	unsigned int rectangleTextureBufferID;
+	Renderer2D_Texture textTexture;
 }Renderer2D;
 
 typedef struct Renderer2D_ShaderPathTypePair{
 	char *path;
 	enum Renderer2D_ShaderTypeEnum type;
 }Renderer2D_ShaderPathTypePair;
+
+void Renderer2D_Texture_initFromText(Renderer2D_Texture *, char *, Font);
 
 void Renderer2D_init(Renderer2D *renderer_p, int width, int height){
 
@@ -101,9 +110,11 @@ void Renderer2D_init(Renderer2D *renderer_p, int width, int height){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	Renderer2D_Texture_initFromText(&renderer_p->textTexture, "", font);
+
 }
 
-void Renderer2D_drawTexture(Renderer2D *renderer_p, float x, float y, float width, float height, Renderer2D_Texture texture, Renderer2D_ShaderProgram shaderProgram){
+void Renderer2D_drawTexture(Renderer2D *renderer_p, float x, float y, float width, float height, float alpha, Renderer2D_Texture texture, Renderer2D_ShaderProgram shaderProgram){
 
 	glBindBuffer(GL_ARRAY_BUFFER, renderer_p->rectangleTextureBufferID);
 
@@ -124,11 +135,13 @@ void Renderer2D_drawTexture(Renderer2D *renderer_p, float x, float y, float widt
 	unsigned int posYUniformLocation = glGetUniformLocation(shaderProgram.ID, "posY");
 	unsigned int widthUniformLocation = glGetUniformLocation(shaderProgram.ID, "width");
 	unsigned int heightUniformLocation = glGetUniformLocation(shaderProgram.ID, "height");
+	unsigned int alphaUniformLocation = glGetUniformLocation(shaderProgram.ID, "alpha");
 
 	glUniform1f(posXUniformLocation, (float)(x * 2) / (float)renderer_p->width);
 	glUniform1f(posYUniformLocation, (float)(y * 2) / (float)renderer_p->height);
 	glUniform1f(widthUniformLocation, (float)width / (float)renderer_p->width);
 	glUniform1f(heightUniformLocation, (float)height / (float)renderer_p->height);
+	glUniform1f(alphaUniformLocation, alpha);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -161,18 +174,17 @@ void Renderer2D_ShaderProgram_init(Renderer2D_ShaderProgram *shaderProgram_p, ch
 
 }
 
-void Renderer2D_Texture_initFromFile(Renderer2D_Texture *texture_p, char *path){
-	
-	texture_p->name = path;
+void Renderer2D_Texture_init(Renderer2D_Texture *texture_p, char *name, char *data, int width, int height){
 
-	int width, height, channels;
-	char *data = stbi_load(path, &width, &height, &channels, 4);
+	texture_p->name = name;
+	texture_p->width = width;
+	texture_p->height = height;
 
 	glGenTextures(1, &texture_p->ID);
 
 	glBindTexture(GL_TEXTURE_2D, texture_p->ID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_p->width, texture_p->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -181,10 +193,37 @@ void Renderer2D_Texture_initFromFile(Renderer2D_Texture *texture_p, char *path){
 
 }
 
-void Renderer2D_Texture_initFromText(Renderer2D_Texture *texture_p, char *text){
+void Renderer2D_Texture_initFromFile(Renderer2D_Texture *texture_p, char *path){
 
+	int width, height, channels;
+	char *data = stbi_load(path, &width, &height, &channels, 4);
+
+	Renderer2D_Texture_init(texture_p, path, data, width, height);
+
+	free(data);
+
+}
+
+void Renderer2D_Texture_initFromText(Renderer2D_Texture *texture_p, char *text, Font font){
+
+	int width, height;
+	char *data = getImageDataFromFontAndString_mustFree(font, text, &width, &height);
+
+	Renderer2D_Texture_init(texture_p, text, data, width, height);
+
+	free(data);
 	
 };
+
+void Renderer2D_drawText(Renderer2D *renderer_p, char *text, int x, int y, Font font, float alpha, Renderer2D_ShaderProgram shaderProgram){
+
+	glDeleteTextures(1, &renderer_p->textTexture.ID);
+
+	Renderer2D_Texture_initFromText(&renderer_p->textTexture, text, font);
+
+	Renderer2D_drawTexture(renderer_p, x, y, renderer_p->textTexture.width, renderer_p->textTexture.height, alpha, renderer_p->textTexture, shaderProgram);
+
+}
 
 Renderer2D renderer;
 Renderer2D_ShaderProgram shaderProgram;
@@ -226,6 +265,8 @@ void Engine_init(){
 
 	Renderer2D_Texture_initFromFile(&texture, "6.jpg");
 
+	font = getFont("times.ttf", 100);
+
 }
 
 void Engine_update(){
@@ -254,7 +295,9 @@ void Engine_draw(){
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	Renderer2D_drawTexture(&renderer, posX, posY, 100, 100, texture, shaderProgram);
+	Renderer2D_drawTexture(&renderer, posX, posY, 100, 100, 1, texture, shaderProgram);
+
+	Renderer2D_drawText(&renderer, "hello", 50, 50, font, 1, shaderProgram);
 
 }
 
