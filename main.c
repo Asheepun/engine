@@ -7,9 +7,6 @@
 
 #include "glad/glad.h"
 
-unsigned int shaderProgram;
-unsigned int texture;
-
 char *readFile_mustFree(char *filePath){
 
 	char *buffer = malloc(sizeof(char) * 1024);
@@ -54,27 +51,144 @@ unsigned int getCompiledShader(char *shaderSourcePath, GLenum type){
 	return shader;
 }
 
-float rectangleVertices[] = {
-	1, 1, 1, 0,
-	-1, 1, 0, 0,
-	-1, -1, 0, 1,
-
-	1, 1, 1, 0,
-	1, -1, 1, 1,
-	-1, -1, 0, 1,
+enum Renderer2D_ShaderTypeEnum{
+	RENDERER2D_VERTEX_SHADER,
+	RENDERER2D_FRAGMENT_SHADER,
 };
 
-float textureVertices[] = {
-	1, 1,
-	0, 1,
-	0, 0,
+typedef struct Renderer2D_Texture{
+	char *name;
+	unsigned int ID;
+}Renderer2D_Texture;
 
-	1, 1,
-	1, 0,
-	0, 0,
+typedef struct Renderer2D_ShaderProgram{
+	char *name;
+	unsigned int ID;
+}Renderer2D_ShaderProgram;
+
+typedef struct Renderer2D{
+	int width;
+	int height;
+	unsigned int rectangleTextureBufferID;
+}Renderer2D;
+
+typedef struct Renderer2D_ShaderPathTypePair{
+	char *path;
+	enum Renderer2D_ShaderTypeEnum type;
+}Renderer2D_ShaderPathTypePair;
+
+void Renderer2D_init(Renderer2D *renderer_p, int width, int height){
+
+	renderer_p->width = width;
+	renderer_p->height = height;
+
+	static float rectangleVertices[] = {
+		1, 1, 1, 0,
+		-1, 1, 0, 0,
+		-1, -1, 0, 1,
+
+		1, 1, 1, 0,
+		1, -1, 1, 1,
+		-1, -1, 0, 1,
+	};
+
+	glGenBuffers(1, &renderer_p->rectangleTextureBufferID);
+
+	glBindBuffer(GL_ARRAY_BUFFER, renderer_p->rectangleTextureBufferID);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+}
+
+void Renderer2D_drawTexture(Renderer2D *renderer_p, float x, float y, float width, float height, Renderer2D_Texture texture, Renderer2D_ShaderProgram shaderProgram){
+
+	glBindBuffer(GL_ARRAY_BUFFER, renderer_p->rectangleTextureBufferID);
+
+	glBindTexture(GL_TEXTURE_2D, texture.ID);
+	
+	glUseProgram(shaderProgram.ID);
+
+	unsigned int vertexPositionAttributeLocation = glGetAttribLocation(shaderProgram.ID, "vertexPosition");
+	unsigned int textureVertexAttributeLocation = glGetAttribLocation(shaderProgram.ID, "textureVertex");
+
+	glVertexAttribPointer(vertexPositionAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(textureVertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+
+	glEnableVertexAttribArray(vertexPositionAttributeLocation);
+	glEnableVertexAttribArray(textureVertexAttributeLocation);
+
+	unsigned int posXUniformLocation = glGetUniformLocation(shaderProgram.ID, "posX");
+	unsigned int posYUniformLocation = glGetUniformLocation(shaderProgram.ID, "posY");
+	unsigned int widthUniformLocation = glGetUniformLocation(shaderProgram.ID, "width");
+	unsigned int heightUniformLocation = glGetUniformLocation(shaderProgram.ID, "height");
+
+	glUniform1f(posXUniformLocation, (float)(x * 2) / (float)renderer_p->width);
+	glUniform1f(posYUniformLocation, (float)(y * 2) / (float)renderer_p->height);
+	glUniform1f(widthUniformLocation, (float)width / (float)renderer_p->width);
+	glUniform1f(heightUniformLocation, (float)height / (float)renderer_p->height);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+}
+
+void Renderer2D_ShaderProgram_init(Renderer2D_ShaderProgram *shaderProgram_p, char *name, Renderer2D_ShaderPathTypePair *shaders, unsigned int shadersLength){
+
+	shaderProgram_p->name = name;
+
+	shaderProgram_p->ID = glCreateProgram();
+
+	for(int i = 0; i < shadersLength; i++){
+
+		unsigned int shaderID;
+		
+		if(shaders[i].type == RENDERER2D_VERTEX_SHADER){
+			shaderID = getCompiledShader(shaders[i].path, GL_VERTEX_SHADER);
+		}
+		if(shaders[i].type == RENDERER2D_FRAGMENT_SHADER){
+			shaderID = getCompiledShader(shaders[i].path, GL_FRAGMENT_SHADER);
+		}
+
+		glAttachShader(shaderProgram_p->ID, shaderID);
+
+	}
+
+	glBindFragDataLocation(shaderProgram_p->ID, 0, "outColor");
+
+	glLinkProgram(shaderProgram_p->ID);
+
+}
+
+void Renderer2D_Texture_initFromFile(Renderer2D_Texture *texture_p, char *path){
+	
+	texture_p->name = path;
+
+	int width, height, channels;
+	char *data = stbi_load(path, &width, &height, &channels, 4);
+
+	glGenTextures(1, &texture_p->ID);
+
+	glBindTexture(GL_TEXTURE_2D, texture_p->ID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+}
+
+void Renderer2D_Texture_initFromText(Renderer2D_Texture *texture_p, char *text){
+
+	
 };
 
-unsigned int VBO;
+Renderer2D renderer;
+Renderer2D_ShaderProgram shaderProgram;
+Renderer2D_Texture texture;
 
 int WIDTH = 480;
 int HEIGHT = 270;
@@ -99,46 +213,18 @@ void Engine_init(){
 
 	printf("%s\n", glGetString(GL_VERSION));
 
-	//generate buffer
+	Renderer2D_init(&renderer, WIDTH, HEIGHT);
 
-	glGenBuffers(1, &VBO);
+	Renderer2D_ShaderPathTypePair shaders[] = {
+		"shaders/vertex-shader.glsl", RENDERER2D_VERTEX_SHADER,
+		"shaders/fragment-shader.glsl", RENDERER2D_FRAGMENT_SHADER,
+	};
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	int shadersLength = sizeof(shaders) / sizeof(Renderer2D_ShaderPathTypePair);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+	Renderer2D_ShaderProgram_init(&shaderProgram, "texture-shader", shaders, shadersLength);
 
-	//compile and link shaders
-	unsigned int vertexShader = getCompiledShader("shaders/vertex-shader.glsl", GL_VERTEX_SHADER);
-
-	unsigned int fragmentShader = getCompiledShader("shaders/fragment-shader.glsl", GL_FRAGMENT_SHADER);
-
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-
-	glBindFragDataLocation(shaderProgram, 0, "outColor");
-
-	glLinkProgram(shaderProgram);
-
-	//load texture
-
-	int textureWidth, textureHeight, channels;
-	unsigned char *textureData = stbi_load("6.jpg", &textureWidth, &textureHeight, &channels, 4);
-
-	glGenTextures(1, &texture);
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Renderer2D_Texture_initFromFile(&texture, "6.jpg");
 
 }
 
@@ -155,8 +241,6 @@ void Engine_update(){
 		velocityX = 0;
 	}
 
-	//velocityY = 1;
-
 	posX += velocityX;
 	posY += velocityY;
 
@@ -170,34 +254,7 @@ void Engine_draw(){
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(shaderProgram);
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	unsigned int vertexPositionAttributeLocation = glGetAttribLocation(shaderProgram, "vertexPosition");
-	unsigned int textureVertexAttributeLocation = glGetAttribLocation(shaderProgram, "textureVertex");
-	
-	glVertexAttribPointer(vertexPositionAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-	glVertexAttribPointer(textureVertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-
-	glEnableVertexAttribArray(vertexPositionAttributeLocation);
-	glEnableVertexAttribArray(textureVertexAttributeLocation);
-
-	unsigned int posXUniformLocation = glGetUniformLocation(shaderProgram, "posX");
-	unsigned int posYUniformLocation = glGetUniformLocation(shaderProgram, "posY");
-	unsigned int widthUniformLocation = glGetUniformLocation(shaderProgram, "width");
-	unsigned int heightUniformLocation = glGetUniformLocation(shaderProgram, "height");
-
-	//printf("%f\n", (float)(posX - WIDTH / 2) / (float)WIDTH);
-
-	glUniform1f(posXUniformLocation, (float)(posX * 2) / (float)WIDTH);
-	glUniform1f(posYUniformLocation, (float)(posY * 2) / (float)HEIGHT);
-	glUniform1f(widthUniformLocation, (float)width / (float)WIDTH);
-	glUniform1f(heightUniformLocation, (float)height / (float)HEIGHT);
-
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	Renderer2D_drawTexture(&renderer, posX, posY, 100, 100, texture, shaderProgram);
 
 }
 
