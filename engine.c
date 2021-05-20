@@ -406,6 +406,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	HGLRC hrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hrc);
 
+	gladLoadGL();
+
 	//common inits
 	initPixelDrawing();
 	initKeys();
@@ -434,7 +436,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		Engine_draw();
 		
-		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
+		//glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
 		resetKeys();
 
