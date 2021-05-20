@@ -329,8 +329,6 @@ int main(){
 
 		float lagMilliseconds = (float)lag / (float)(CLOCKS_PER_SEC / 1000);
 
-		printf("%f\n", lagMilliseconds);
-
 		usleep(lagMilliseconds * 1000);
 
 	
