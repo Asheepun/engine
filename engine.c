@@ -52,6 +52,8 @@ int screenWidth = 800;
 int screenHeight = 450;
 Engine_Pixel *screenPixels = NULL;
 
+int elapsedFrames = 0;
+
 Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];
 
 #ifdef __linux__
@@ -315,6 +317,8 @@ int main(){
 
 		resetKeys();
 
+		elapsedFrames++;
+
 		endTicks = clock();
 
 		int lag = ticksPerFrame - (endTicks - startTicks);
@@ -324,6 +328,8 @@ int main(){
 		}
 
 		float lagMilliseconds = (float)lag / (float)(CLOCKS_PER_SEC / 1000);
+
+		printf("%f\n", lagMilliseconds);
 
 		usleep(lagMilliseconds * 1000);
 
@@ -431,6 +437,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
 		resetKeys();
+
+		elapsedFrames++;
 		
 		SwapBuffers(hdc);
 		

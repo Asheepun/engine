@@ -102,6 +102,8 @@ extern int screenHeight;
 
 extern Engine_Pixel *screenPixels;
 
+extern int elapsedFrames;
+
 //ENGINE FUNCTIONS
 
 //WINDOW FUNCTIONS

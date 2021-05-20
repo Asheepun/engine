@@ -215,13 +215,16 @@ void Renderer2D_Texture_initFromText(Renderer2D_Texture *texture_p, char *text, 
 	
 };
 
-void Renderer2D_drawText(Renderer2D *renderer_p, char *text, int x, int y, Font font, float alpha, Renderer2D_ShaderProgram shaderProgram){
+void Renderer2D_drawText(Renderer2D *renderer_p, char *text, int x, int y, int fontSize, Font font, float alpha, Renderer2D_ShaderProgram shaderProgram){
 
 	glDeleteTextures(1, &renderer_p->textTexture.ID);
 
 	Renderer2D_Texture_initFromText(&renderer_p->textTexture, text, font);
 
-	Renderer2D_drawTexture(renderer_p, x, y, renderer_p->textTexture.width, renderer_p->textTexture.height, alpha, renderer_p->textTexture, shaderProgram);
+	int height = fontSize;
+	int width = renderer_p->textTexture.width * fontSize / renderer_p->textTexture.height;
+
+	Renderer2D_drawTexture(renderer_p, x, y, width, height, alpha, renderer_p->textTexture, shaderProgram);
 
 }
 
@@ -269,6 +272,8 @@ void Engine_init(){
 
 }
 
+float fontSize = 50;
+
 void Engine_update(){
 
 	if(ENGINE_KEYS[ENGINE_KEY_D].down){
@@ -285,6 +290,8 @@ void Engine_update(){
 	posX += velocityX;
 	posY += velocityY;
 
+	fontSize = 50 + sin(elapsedFrames * 0.05) * 40;
+
 }
 
 void Engine_draw(){
@@ -297,7 +304,7 @@ void Engine_draw(){
 
 	Renderer2D_drawTexture(&renderer, posX, posY, 100, 100, 1, texture, shaderProgram);
 
-	Renderer2D_drawText(&renderer, "hello", 50, 50, font, 1, shaderProgram);
+	Renderer2D_drawText(&renderer, "hello", 50, 50, fontSize, font, 1, shaderProgram);
 
 }
 
