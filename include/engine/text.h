@@ -1,7 +1,7 @@
 #ifndef TEXT_H_
 #define TEXT_H_
 
-#include "stb_truetype.h"
+#include "stb/stb_truetype.h"
 
 typedef struct Glyph{
 

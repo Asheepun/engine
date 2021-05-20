@@ -3,7 +3,7 @@
 
 #include "stdlib.h"
 #include "stdbool.h"
-#include "geometry.h"
+#include "engine/geometry.h"
 
 #define COLOR_BUFFER_SIZE 1920
 
@@ -126,7 +126,7 @@ void Engine_drawTriangle(Vec2f *, Engine_Pixel);
 
 void Engine_fillTriangle(Vec2f *, Engine_Pixel);
 
-void Engine_init();
+void Engine_start();
 
 void Engine_update();
 

@@ -1,13 +1,14 @@
-#include "engine.h"
+#include "engine/engine.h"
+#include "engine/text.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
+#include "glad/glad.h"
+
 #include "stdio.h"
 #include "math.h"
 #include "string.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#include "text.h"
-
-#include "glad/glad.h"
 
 Font font;
 
@@ -248,7 +249,7 @@ float speedX = 2;
 
 int scale = 2;
 
-void Engine_init(){
+void Engine_start(){
 
 	Engine_setWindowSize(WIDTH * 2.5, HEIGHT * 2.5);
 	Engine_centerWindow();
@@ -266,9 +267,9 @@ void Engine_init(){
 
 	Renderer2D_ShaderProgram_init(&shaderProgram, "texture-shader", shaders, shadersLength);
 
-	Renderer2D_Texture_initFromFile(&texture, "6.jpg");
+	Renderer2D_Texture_initFromFile(&texture, "assets/textures/6.jpg");
 
-	font = getFont("times.ttf", 100);
+	font = getFont("assets/fonts/times.ttf", 100);
 
 }
 

@@ -1,7 +1,8 @@
+#include "engine/geometry.h"
+
 #include "stdbool.h"
 #include "math.h"
 #include "stdio.h"
-#include "geometry.h"
 
 //GENERAL MATH FUNCTIONS
 float normalize(float x){

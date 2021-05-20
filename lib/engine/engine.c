@@ -1,5 +1,5 @@
 //common includes
-#include "engine.h"
+#include "engine/engine.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -246,7 +246,7 @@ int main(){
 	initPixelDrawing();
 	initKeys();
 
-	Engine_init();
+	Engine_start();
 
 	//game loop
 	size_t startTicks = 0;
@@ -412,7 +412,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	initPixelDrawing();
 	initKeys();
 	
-	Engine_init();
+	Engine_start();
 	
 	ShowWindow(hwnd, nCmdShow);
 	
