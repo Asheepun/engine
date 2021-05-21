@@ -1,9 +1,6 @@
 #version 130
 
 in vec2 vertexPosition;
-in vec2 textureVertex;
-
-out vec2 textureCoord;
 
 uniform float posX = 0;
 uniform float posY = 0;
@@ -19,7 +16,5 @@ void main(){
 		0.0,
 		1.0
 	);
-
-	textureCoord = textureVertex;
 
 }

@@ -152,19 +152,36 @@ void Renderer2D_ShaderProgram_init(Renderer2D_ShaderProgram *shaderProgram_p, ch
 
 	}
 
-	glBindFragDataLocation(shaderProgram_p->ID, 0, "outColor");
-
 	glLinkProgram(shaderProgram_p->ID);
 
 }
 
-//DRAWING FUNCTIONS
+//SETTINGS FUNCTIONS
 
-void Renderer2D_setRenderSize(int width, int height){
+void Renderer2D_updateDrawSize(Renderer2D *renderer_p, int width, int height){
 
-	glViewport(0, 0, width, height);
+	float newWidth = width;
+	float newHeight = height;
+
+	float offsetX = 0;
+	float offsetY = 0;
+
+	float aspectRatio = (float)renderer_p->width / (float)renderer_p->height;
+
+	if(width / height > aspectRatio){
+		newWidth = height * aspectRatio;
+	}else{
+		newHeight = width / aspectRatio;
+	}
+
+	offsetX = (width - newWidth) / 2;
+	offsetY = (height - newHeight) / 2;
+
+	glViewport((int)offsetX, (int)offsetY, (int)newWidth, (int)newHeight);
 
 }
+
+//DRAWING FUNCTIONS
 
 void Renderer2D_clearBackground(float r, float g, float b, float a){
 

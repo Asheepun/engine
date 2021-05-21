@@ -44,9 +44,11 @@ void Renderer2D_Texture_initFromText(Renderer2D_Texture *, char *, Font);
 
 void Renderer2D_ShaderProgram_init(Renderer2D_ShaderProgram *, char *, Renderer2D_ShaderPathTypePair *, unsigned int);
 
-//DRAWING FUNCTIONS
+//SETTINGS FUNCTIONS
 
-void Renderer2D_setRenderSize(int, int);
+void Renderer2D_updateDrawSize(Renderer2D *, int, int);
+
+//DRAWING FUNCTIONS
 
 void Renderer2D_clearBackground(float, float, float, float);
 

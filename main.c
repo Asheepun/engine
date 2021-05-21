@@ -38,8 +38,8 @@ void Engine_start(){
 	Renderer2D_init(&renderer, WIDTH, HEIGHT);
 
 	Renderer2D_ShaderPathTypePair shaders[] = {
-		"shaders/vertex-shader.glsl", RENDERER2D_VERTEX_SHADER,
-		"shaders/fragment-shader.glsl", RENDERER2D_FRAGMENT_SHADER,
+		"shaders/texture-vertex-shader.glsl", RENDERER2D_VERTEX_SHADER,
+		"shaders/texture-fragment-shader.glsl", RENDERER2D_FRAGMENT_SHADER,
 	};
 
 	int shadersLength = sizeof(shaders) / sizeof(Renderer2D_ShaderPathTypePair);
@@ -74,7 +74,7 @@ void Engine_update(){
 
 void Engine_draw(){
 
-	Renderer2D_setRenderSize(screenWidth, screenHeight);
+	Renderer2D_updateDrawSize(&renderer, screenWidth, screenHeight);
 
 	Renderer2D_clearBackground(0.5, 0.3, 0.4, 1.0);
 
