@@ -1,10 +1,10 @@
-#version 130
+#version 100
 
-out vec4 outColor;
+precision mediump float;
+
+uniform float alpha;
 
 uniform vec3 color;
-
-uniform float alpha = 1;
 
 void main(){
 

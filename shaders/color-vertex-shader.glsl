@@ -1,18 +1,18 @@
-#version 130
+#version 100
 
-in vec2 vertexPosition;
+attribute vec2 vertexPosition;
 
-uniform float posX = 0;
-uniform float posY = 0;
+uniform float posX;
+uniform float posY;
 
-uniform float width = 1;
-uniform float height = 1;
+uniform float width;
+uniform float height;
 
 void main(){
 
 	gl_Position = vec4(
-		posX + width + -1 + vertexPosition.x * width,
-		-posY + -height + 1 + vertexPosition.y * height,
+		posX + width + -1.0 + vertexPosition.x * width,
+		-posY + -height + 1.0 + vertexPosition.y * height,
 		0.0,
 		1.0
 	);

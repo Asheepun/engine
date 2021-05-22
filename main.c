@@ -9,7 +9,6 @@
 Font font;
 
 Renderer2D renderer;
-Renderer2D_ShaderProgram shaderProgram;
 Renderer2D_Texture texture;
 
 int WIDTH = 480;
@@ -36,15 +35,6 @@ void Engine_start(){
 	Engine_centerWindow();
 
 	Renderer2D_init(&renderer, WIDTH, HEIGHT);
-
-	Renderer2D_ShaderPathTypePair shaders[] = {
-		"shaders/texture-vertex-shader.glsl", RENDERER2D_VERTEX_SHADER,
-		"shaders/texture-fragment-shader.glsl", RENDERER2D_FRAGMENT_SHADER,
-	};
-
-	int shadersLength = sizeof(shaders) / sizeof(Renderer2D_ShaderPathTypePair);
-
-	Renderer2D_ShaderProgram_init(&shaderProgram, "texture-shader", shaders, shadersLength);
 
 	Renderer2D_Texture_initFromFile(&texture, "assets/textures/6.jpg");
 
@@ -78,9 +68,31 @@ void Engine_draw(){
 
 	Renderer2D_clearBackground(0.5, 0.3, 0.4, 1.0);
 
-	Renderer2D_drawTexture(&renderer, posX, posY, 100, 100, 1, texture, shaderProgram);
+	Renderer2D_setShaderProgram(&renderer, renderer.colorShaderProgram);
 
-	Renderer2D_drawText(&renderer, "hello", 50, 50, fontSize, font, 1, shaderProgram);
+	Renderer2D_beginRectangle(&renderer, posX, posY, 100, 100);
+
+	Renderer2D_setTexture(&renderer, texture);
+
+	float alpha = 1.0;
+
+	Renderer2D_Color color = { 0.5, 1.0, 0.7 };
+
+	Renderer2D_supplyUniform(&renderer, &alpha, "alpha", RENDERER2D_UNIFORM_TYPE_FLOAT);
+
+	Renderer2D_supplyUniform(&renderer, &color, "color", RENDERER2D_UNIFORM_TYPE_COLOR);
+
+	Renderer2D_drawRectangle(&renderer);
+
+	Renderer2D_setShaderProgram(&renderer, renderer.textureShaderProgram);
+	
+	Renderer2D_beginText(&renderer, "hello", 50, 50, fontSize, font);
+
+	alpha = 1.0;
+
+	Renderer2D_supplyUniform(&renderer, &alpha, "alpha", RENDERER2D_UNIFORM_TYPE_FLOAT);
+
+	Renderer2D_drawRectangle(&renderer);
 
 }
 
