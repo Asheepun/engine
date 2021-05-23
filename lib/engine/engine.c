@@ -534,7 +534,7 @@ void Engine_setWindowSize(int width, int height){
 void Engine_centerWindow(){
 
 #ifdef __linux__
-	XMoveWindow(dpy, win, DisplayWidth(dpy, screenNumber) / 2 - windowWidth / 2, DisplayHeight(dpy, screenNumber) / 2 - windowWidth / 2);
+	XMoveWindow(dpy, win, DisplayWidth(dpy, screenNumber) / 2 - windowWidth / 2, DisplayHeight(dpy, screenNumber) / 2 - windowHeight / 2);
 #endif
 
 }
