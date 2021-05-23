@@ -47,10 +47,12 @@ HWND hwnd;
 
 //GLOBAL VARIABLE DEFINITIONS
 
-Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
-int screenWidth = 800;
-int screenHeight = 450;
-Engine_Pixel *screenPixels = NULL;
+//Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
+//int screenWidth = 800;
+//int screenHeight = 450;
+//Engine_Pixel *screenPixels = NULL;
+int windowWidth = 800;
+int windowHeight = 450;
 
 int elapsedFrames = 0;
 
@@ -162,6 +164,7 @@ static unsigned int OS_KEY_IDENTIFIERS[] = {
 
 //COMMON INITS
 
+/*
 void initPixelDrawing(){
 
 	//init screen pixels
@@ -175,6 +178,7 @@ void initPixelDrawing(){
 	}
 
 }
+*/
 
 void initKeys(){
 
@@ -225,7 +229,7 @@ int main(){
 	swa.colormap = cmap;
 	swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask;
 
-	win = XCreateWindow(dpy, root, 0, 0, screenWidth, screenHeight, 0, vi->depth, InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+	win = XCreateWindow(dpy, root, 0, 0, windowWidth, windowHeight, 0, vi->depth, InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
 
 	XMapWindow(dpy, win);
 
@@ -243,7 +247,7 @@ int main(){
 	XkbSetDetectableAutoRepeat(dpy, true, &autoRepeatIsAvailable);
 
 	//common inits
-	initPixelDrawing();
+	//initPixelDrawing();
 	initKeys();
 
 	Engine_start();
@@ -407,7 +411,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gladLoadGL();
 
 	//common inits
-	initPixelDrawing();
+	//initPixelDrawing();
 	initKeys();
 	
 	Engine_start();
@@ -486,6 +490,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 
 		
 	}
+
+	if(uMsg == WM_SIZE){
+
+		windowWidth = LOWORD(lParam);
+		windowHeight = HIWORD(lParam);
+
+	}
 	
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 
@@ -505,6 +516,9 @@ void Engine_setWindowTitle(char *title){
 
 void Engine_setWindowSize(int width, int height){
 
+	windowWidth = width;
+	windowHeight = height;
+
 #ifdef __linux__
 	XResizeWindow(dpy, win, width, height);
 #endif
@@ -513,21 +527,19 @@ void Engine_setWindowSize(int width, int height){
 	SetWindowPos(hwnd, NULL, GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2, GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2, width, height, SWP_SHOWWINDOW);
 #endif
 
-	screenWidth = width;
-	screenHeight = height;
-
-	screenPixels = malloc(sizeof(Engine_Pixel) * width * height);
+	//screenPixels = malloc(sizeof(Engine_Pixel) * width * height);
 
 }
 
 void Engine_centerWindow(){
 
 #ifdef __linux__
-	XMoveWindow(dpy, win, DisplayWidth(dpy, screenNumber) / 2 - screenWidth / 2, DisplayHeight(dpy, screenNumber) / 2 - screenHeight / 2);
+	XMoveWindow(dpy, win, DisplayWidth(dpy, screenNumber) / 2 - windowWidth / 2, DisplayHeight(dpy, screenNumber) / 2 - windowWidth / 2);
 #endif
 
 }
 
+/*
 //DRAWING FUNCTIONS
 unsigned int Engine_getScreenPixelIndex(int x, int y){
 	return x + (screenHeight - y - 1) * screenWidth;
@@ -611,3 +623,4 @@ void Engine_fillTriangle(Vec2f *verts, Engine_Pixel color){
 	
 
 }
+*/

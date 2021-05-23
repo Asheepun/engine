@@ -70,7 +70,7 @@ void Engine_draw(){
 	float alpha;
 	Renderer2D_Color color;
 
-	Renderer2D_updateDrawSize(&renderer, screenWidth, screenHeight);
+	Renderer2D_updateDrawSize(&renderer, windowWidth, windowHeight);
 
 	Renderer2D_clear(&renderer);
 

@@ -95,12 +95,15 @@ static const Engine_Pixel ENGINE_COLORS[ENGINE_COLORS_LENGTH] = {
 
 //GLOBAL VARIABLE DECLARTIONS
 extern Engine_Key ENGINE_KEYS[ENGINE_KEYS_LENGTH];
-extern Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
+//extern Engine_Pixel colorBuffers[ENGINE_COLORS_LENGTH][COLOR_BUFFER_SIZE];
 
-extern int screenWidth;
-extern int screenHeight;
+//extern int screenWidth;
+//extern int screenHeight;
 
-extern Engine_Pixel *screenPixels;
+//extern Engine_Pixel *screenPixels;
+
+extern int windowWidth;
+extern int windowHeight;
 
 extern int elapsedFrames;
 
