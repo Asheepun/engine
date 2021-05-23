@@ -206,9 +206,9 @@ void Renderer2D_updateDrawSize(Renderer2D *renderer_p, int width, int height){
 
 //DRAWING FUNCTIONS
 
-void Renderer2D_clearBackground(float r, float g, float b, float a){
+void Renderer2D_clear(Renderer2D *renderer_p){
 
-	glClearColor(r, g, b, a);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -246,8 +246,8 @@ void Renderer2D_beginRectangle(Renderer2D *renderer_p, float x, float y, float w
 	unsigned int widthUniformLocation = glGetUniformLocation(renderer_p->currentShaderProgram.ID, "width");
 	unsigned int heightUniformLocation = glGetUniformLocation(renderer_p->currentShaderProgram.ID, "height");
 
-	glUniform1f(posXUniformLocation, (float)(x * 2) / (float)renderer_p->width);
-	glUniform1f(posYUniformLocation, (float)(y * 2) / (float)renderer_p->height);
+	glUniform1f(posXUniformLocation, 2 * ((float)x + renderer_p->offsetX) / (float)renderer_p->width);
+	glUniform1f(posYUniformLocation, 2 * ((float)y + renderer_p->offsetY) / (float)renderer_p->height);
 	glUniform1f(widthUniformLocation, (float)width / (float)renderer_p->width);
 	glUniform1f(heightUniformLocation, (float)height / (float)renderer_p->height);
 
@@ -276,39 +276,6 @@ void Renderer2D_drawRectangle(Renderer2D *renderer_p){
 
 }
 
-void Renderer2D_drawTexture(Renderer2D *renderer_p, float x, float y, float width, float height, float alpha, Renderer2D_Texture texture, Renderer2D_ShaderProgram shaderProgram){
-
-	glBindBuffer(GL_ARRAY_BUFFER, renderer_p->rectangleTextureBufferID);
-	
-	glUseProgram(shaderProgram.ID);
-
-	unsigned int vertexPositionAttributeLocation = glGetAttribLocation(shaderProgram.ID, "vertexPosition");
-	unsigned int textureVertexAttributeLocation = glGetAttribLocation(shaderProgram.ID, "textureVertex");
-
-	glVertexAttribPointer(vertexPositionAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(textureVertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-
-	glEnableVertexAttribArray(vertexPositionAttributeLocation);
-	glEnableVertexAttribArray(textureVertexAttributeLocation);
-
-	unsigned int posXUniformLocation = glGetUniformLocation(shaderProgram.ID, "posX");
-	unsigned int posYUniformLocation = glGetUniformLocation(shaderProgram.ID, "posY");
-	unsigned int widthUniformLocation = glGetUniformLocation(shaderProgram.ID, "width");
-	unsigned int heightUniformLocation = glGetUniformLocation(shaderProgram.ID, "height");
-	unsigned int alphaUniformLocation = glGetUniformLocation(shaderProgram.ID, "alpha");
-
-	glUniform1f(posXUniformLocation, (float)(x * 2) / (float)renderer_p->width);
-	glUniform1f(posYUniformLocation, (float)(y * 2) / (float)renderer_p->height);
-	glUniform1f(widthUniformLocation, (float)width / (float)renderer_p->width);
-	glUniform1f(heightUniformLocation, (float)height / (float)renderer_p->height);
-	glUniform1f(alphaUniformLocation, alpha);
-
-	glBindTexture(GL_TEXTURE_2D, texture.ID);
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-}
-
 void Renderer2D_beginText(Renderer2D *renderer_p, char *text, int x, int y, int fontSize, Font font){
 
 	glDeleteTextures(1, &renderer_p->textTexture.ID);
@@ -324,15 +291,7 @@ void Renderer2D_beginText(Renderer2D *renderer_p, char *text, int x, int y, int 
 
 }
 
-void Renderer2D_drawText(Renderer2D *renderer_p, char *text, int x, int y, int fontSize, Font font, float alpha, Renderer2D_ShaderProgram shaderProgram){
-
-	glDeleteTextures(1, &renderer_p->textTexture.ID);
-
-	Renderer2D_Texture_initFromText(&renderer_p->textTexture, text, font);
-
-	int height = fontSize;
-	int width = renderer_p->textTexture.width * fontSize / renderer_p->textTexture.height;
-
-	Renderer2D_drawTexture(renderer_p, x, y, width, height, alpha, renderer_p->textTexture, shaderProgram);
-
+Renderer2D_Color Renderer2D_getColor(float r, float g, float b){
+	Renderer2D_Color color = { r, g, b };
+	return color;
 }

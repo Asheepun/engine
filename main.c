@@ -60,27 +60,41 @@ void Engine_update(){
 
 	fontSize = 50 + sin(elapsedFrames * 0.05) * 40;
 
+	renderer.offsetX = 0;
+	renderer.offsetY = 0;
+
 }
 
 void Engine_draw(){
 
+	float alpha;
+	Renderer2D_Color color;
+
 	Renderer2D_updateDrawSize(&renderer, screenWidth, screenHeight);
 
-	Renderer2D_clearBackground(0.5, 0.3, 0.4, 1.0);
+	Renderer2D_clear(&renderer);
 
 	Renderer2D_setShaderProgram(&renderer, renderer.colorShaderProgram);
+
+	Renderer2D_beginRectangle(&renderer, -renderer.offsetX, -renderer.offsetY, renderer.width, renderer.height);
+
+	alpha = 1.0;
+	color = Renderer2D_getColor(0.6, 0.3, 0.4);
+
+	Renderer2D_supplyUniform(&renderer, &alpha, "alpha", RENDERER2D_UNIFORM_TYPE_FLOAT);
+	Renderer2D_supplyUniform(&renderer, &color, "color", RENDERER2D_UNIFORM_TYPE_COLOR);
+
+	Renderer2D_drawRectangle(&renderer);
+
+	Renderer2D_setShaderProgram(&renderer, renderer.textureShaderProgram);
 
 	Renderer2D_beginRectangle(&renderer, posX, posY, 100, 100);
 
 	Renderer2D_setTexture(&renderer, texture);
 
-	float alpha = 1.0;
-
-	Renderer2D_Color color = { 0.5, 1.0, 0.7 };
+	alpha = 1.0;
 
 	Renderer2D_supplyUniform(&renderer, &alpha, "alpha", RENDERER2D_UNIFORM_TYPE_FLOAT);
-
-	Renderer2D_supplyUniform(&renderer, &color, "color", RENDERER2D_UNIFORM_TYPE_COLOR);
 
 	Renderer2D_drawRectangle(&renderer);
 

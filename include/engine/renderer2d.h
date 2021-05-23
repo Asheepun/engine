@@ -39,6 +39,8 @@ typedef struct Renderer2D_ShaderProgram{
 typedef struct Renderer2D{
 	int width;
 	int height;
+	float offsetX;
+	float offsetY;
 	unsigned int rectangleTextureBufferID;
 	Renderer2D_Texture textTexture;
 
@@ -66,7 +68,7 @@ void Renderer2D_updateDrawSize(Renderer2D *, int, int);
 
 //DRAWING FUNCTIONS
 
-void Renderer2D_clearBackground(float, float, float, float);
+void Renderer2D_clear(Renderer2D *);
 
 void Renderer2D_setShaderProgram(Renderer2D *, Renderer2D_ShaderProgram);
 
@@ -80,8 +82,6 @@ void Renderer2D_supplyUniform(Renderer2D *, void *, char *, enum Renderer2D_Unif
 
 void Renderer2D_drawRectangle(Renderer2D *);
 
-void Renderer2D_drawTexture(Renderer2D *, float, float, float, float, float, Renderer2D_Texture, Renderer2D_ShaderProgram);
-
-void Renderer2D_drawText(Renderer2D *, char *, int, int, int, Font, float, Renderer2D_ShaderProgram);
+Renderer2D_Color Renderer2D_getColor(float, float, float);
 
 #endif
