@@ -276,6 +276,18 @@ int main(){
 				quit = true;
 			}
 
+			if(xev.type == ConfigureNotify){
+
+				XConfigureEvent xce = xev.xconfigure;
+
+				if(xce.width != windowWidth
+				|| xce.height != windowHeight){
+					windowWidth = xce.width;
+					windowHeight = xce.height;
+				}
+
+			}
+
 			if(xev.type == KeyPress){
 
 				if(xev.xkey.keycode == XKeysymToKeycode(dpy, XK_Q)){
