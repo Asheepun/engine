@@ -24,7 +24,6 @@
 #include "time.h"
 
 #include "windows.h"
-#include "wingdi.h"
 #endif
 
 #ifdef __linux__
