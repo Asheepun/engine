@@ -109,6 +109,8 @@ extern int elapsedFrames;
 
 //ENGINE FUNCTIONS
 
+void Engine_quit();
+
 //WINDOW FUNCTIONS
 
 void Engine_setWindowTitle(char *);

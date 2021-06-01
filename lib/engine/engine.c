@@ -25,6 +25,9 @@
 
 #include "windows.h"
 #include "wingdi.h"
+
+#include "wglext.h"
+
 #endif
 
 #ifdef __linux__
@@ -162,6 +165,8 @@ static unsigned int OS_KEY_IDENTIFIERS[] = {
 };
 #endif
 
+bool programShouldQuit = false;
+
 //COMMON INITS
 
 /*
@@ -260,9 +265,9 @@ int main(){
 
 	size_t ticksPerFrame = CLOCKS_PER_SEC / fps;
 
-	bool quit = false;
+	//bool quit = false;
 
-	while(!quit){
+	while(!programShouldQuit){
 
 		startTicks = clock();
 
@@ -273,7 +278,7 @@ int main(){
 
 			if(xev.type == ClientMessage
 			|| xev.type == DestroyNotify){
-				quit = true;
+				programShouldQuit = true;
 			}
 
 			if(xev.type == ConfigureNotify){
@@ -290,9 +295,9 @@ int main(){
 
 			if(xev.type == KeyPress){
 
-				if(xev.xkey.keycode == XKeysymToKeycode(dpy, XK_Q)){
-					quit = true;
-				}
+				//if(xev.xkey.keycode == XKeysymToKeycode(dpy, XK_Q)){
+					//quit = true;
+				//}
 
 				for(int i = 0; i < ENGINE_KEYS_LENGTH; i++){
 					if(xev.xkey.keycode == XKeysymToKeycode(dpy, ENGINE_KEYS[i].OSIdentifier)){
@@ -358,7 +363,7 @@ int main(){
 #endif
 
 #ifdef _WIN32
-bool QUIT_PROGRAM = false;
+//bool QUIT_PROGRAM = false;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -422,6 +427,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	gladLoadGL();
 
+	//printf("%s\n", glGetString(GL_EXTENSIONS));
+	printf("%s\n", wglGetExtensionsStringARB());
+
+	//wglSwapIntervalEXT(0);
+
 	//common inits
 	//initPixelDrawing();
 	initKeys();
@@ -429,9 +439,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Engine_start();
 	
 	ShowWindow(hwnd, nCmdShow);
+
+	LARGE_INTEGER liFrequency = {0};
+	LARGE_INTEGER liStart = {0};
+	LARGE_INTEGER liStop = {0};
 	
 	//game loop
-	while(!QUIT_PROGRAM){
+	while(!programShouldQuit){
+
+		QueryPerformanceFrequency(&liFrequency);
+
+		QueryPerformanceCounter(&liStart);
 	
 		//handle events
 		MSG msg = {};
@@ -455,6 +473,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		resetKeys();
 
 		elapsedFrames++;
+
+		QueryPerformanceCounter(&liStop);
+
+		LONGLONG deltaTime = (liStop.QuadPart - liStart.QuadPart) * 1000000 / liFrequency.QuadPart;
+
+		printf("%i\n", deltaTime);
 		
 		SwapBuffers(hdc);
 		
@@ -472,7 +496,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 	|| uMsg == WM_DESTROY
 	|| uMsg == WM_QUIT){
 		PostQuitMessage(0);
-		QUIT_PROGRAM = true;
+		programShouldQuit = true;
 		return 0;
 	}
 
@@ -516,6 +540,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 #endif
 
 //ENGINE FUNCTIONS
+
+void Engine_quit(){
+	programShouldQuit = true;
+}
 
 //WINDOW FUNCTIONS
 void Engine_setWindowTitle(char *title){
