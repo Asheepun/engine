@@ -24,10 +24,6 @@
 #include "time.h"
 
 #include "windows.h"
-#include "wingdi.h"
-
-#include "wglext.h"
-
 #endif
 
 #ifdef __linux__
@@ -428,7 +424,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gladLoadGL();
 
 	//printf("%s\n", glGetString(GL_EXTENSIONS));
-	printf("%s\n", wglGetExtensionsStringARB());
+	//printf("%s\n", wglGetExtensionsStringARB());
 
 	//wglSwapIntervalEXT(0);
 
