@@ -6,7 +6,10 @@
 #include "string.h"
 #include "math.h"
 
-#include "glad/glad.h"
+//#include "glad/glad.h"
+
+#include "glad/wgl.h"
+#include "glad/gl.h"
 
 //linux includes
 #ifdef __linux__
@@ -22,8 +25,13 @@
 //windows includes
 #ifdef _WIN32
 #include "time.h"
+#include <limits.h>
+#include <winnt.h>
 
 #include "windows.h"
+
+//#include "glad/glad_wgl.h"
+
 #endif
 
 #ifdef __linux__
@@ -239,7 +247,7 @@ int main(){
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
 
-	gladLoadGL();
+	//gladLoadGL();
 
 	Atom wmDelete = XInternAtom(dpy, "WM_DELETE_WINDOW", true);
 	XSetWMProtocols(dpy, win, &wmDelete, 1);
@@ -322,7 +330,7 @@ int main(){
 
 		//update
 
-		Engine_update();
+		Engine_update(1);
 
 		//draw
 
@@ -421,7 +429,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	HGLRC hrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hrc);
 
-	gladLoadGL();
+	gladLoaderLoadWGL(hdc);
+	gladLoaderLoadGL();
+	//gladLoadGL();
+
+	wglSwapIntervalEXT(0);
 
 	//printf("%s\n", glGetString(GL_EXTENSIONS));
 	//printf("%s\n", wglGetExtensionsStringARB());
@@ -439,7 +451,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LARGE_INTEGER liFrequency = {0};
 	LARGE_INTEGER liStart = {0};
 	LARGE_INTEGER liStop = {0};
-	
+
+	float deltaTime;
+
 	//game loop
 	while(!programShouldQuit){
 
@@ -458,11 +472,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		//update
 			
-		Engine_update();
+		Engine_update(deltaTime);
 		
 		//draw
 		
 		Engine_draw();
+		
+		SwapBuffers(hdc);
 		
 		//glDrawPixels(screenWidth, screenHeight, GL_RGB, GL_UNSIGNED_BYTE, screenPixels);
 
@@ -472,12 +488,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		QueryPerformanceCounter(&liStop);
 
-		LONGLONG deltaTime = (liStop.QuadPart - liStart.QuadPart) * 1000000 / liFrequency.QuadPart;
+		deltaTime = (float)((liStop.QuadPart - liStart.QuadPart) * 1000000 / liFrequency.QuadPart) / 1000000;
 
-		printf("%i\n", deltaTime);
-		
-		SwapBuffers(hdc);
-		
 	}
 
 	Engine_finnish();

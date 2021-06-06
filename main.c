@@ -39,21 +39,21 @@ void Engine_start(){
 	player.size = getVec2f(40, 40);
 	player.velocity = getVec2f(0, 0);
 	player.acceleration = getVec2f(0, 0);
-	player.speed = 2;
+	player.speed = 100;
 
 }
 
-void Engine_update(){
+void Engine_update(float deltaTime){
 
 	if(ENGINE_KEYS[ENGINE_KEY_Q].down){
 		Engine_quit();
 	}
 
 	if(ENGINE_KEYS[ENGINE_KEY_A].down){
-		player.velocity.x = -player.speed;
+		player.velocity.x = -player.speed * deltaTime;
 	}
 	if(ENGINE_KEYS[ENGINE_KEY_D].down){
-		player.velocity.x = player.speed;
+		player.velocity.x = player.speed * deltaTime;
 	}
 	if(ENGINE_KEYS[ENGINE_KEY_A].down && ENGINE_KEYS[ENGINE_KEY_D].down
 	|| !ENGINE_KEYS[ENGINE_KEY_A].down && !ENGINE_KEYS[ENGINE_KEY_D].down){
@@ -61,10 +61,10 @@ void Engine_update(){
 	}
 
 	if(ENGINE_KEYS[ENGINE_KEY_W].down){
-		player.velocity.y = -player.speed;
+		player.velocity.y = -player.speed * deltaTime;
 	}
 	if(ENGINE_KEYS[ENGINE_KEY_S].down){
-		player.velocity.y = player.speed;
+		player.velocity.y = player.speed * deltaTime;
 	}
 	if(ENGINE_KEYS[ENGINE_KEY_W].down && ENGINE_KEYS[ENGINE_KEY_S].down
 	|| !ENGINE_KEYS[ENGINE_KEY_W].down && !ENGINE_KEYS[ENGINE_KEY_S].down){

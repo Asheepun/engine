@@ -133,7 +133,7 @@ void Engine_fillTriangle(Vec2f *, Engine_Pixel);
 
 void Engine_start();
 
-void Engine_update();
+void Engine_update(float);
 
 void Engine_draw();
 
