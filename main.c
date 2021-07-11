@@ -1,6 +1,8 @@
 #include "engine/engine.h"
 #include "engine/text.h"
 #include "engine/renderer2d.h"
+#include "engine/audio.h"
+#include "engine/new-string.h"
 
 #include "stdio.h"
 #include "math.h"
@@ -57,6 +59,12 @@ void addBlock(Vec2f pos, Vec2f size, Vec2f velocity){
 
 void Engine_start(){
 
+	//String stringA;
+
+	//String_init(&stringA, "hello from string A");
+
+	//printf("%s\n", stringA.characters);
+
 	Engine_setWindowSize(WIDTH * 2.5, HEIGHT * 2.5);
 	Engine_centerWindow();
 
@@ -65,6 +73,18 @@ void Engine_start(){
 	Renderer2D_Texture_initFromFile(&texture, "assets/textures/6.jpg");
 
 	font = getFont("assets/fonts/times.ttf", 100);
+
+	char *soundFiles[] = {
+		"enemies-west",
+		"kid-laugh",
+		"crow-call",
+	};
+
+	int soundFilesLength = sizeof(soundFiles) / sizeof(char *);
+
+	Audio_init(soundFiles, soundFilesLength);
+
+	//Audio_playSound("enemies-west", 0.5, false, AUDIO_SOUND_TYPE_MUSIC);
 
 	player.pos = getVec2f(100, 100);
 	player.size = getVec2f(40, 40);
@@ -105,6 +125,12 @@ void Engine_update(float deltaTime){
 	if(ENGINE_KEYS[ENGINE_KEY_W].down && ENGINE_KEYS[ENGINE_KEY_S].down
 	|| !ENGINE_KEYS[ENGINE_KEY_W].down && !ENGINE_KEYS[ENGINE_KEY_S].down){
 		player.acceleration.y = 0;
+	}
+
+	if(ENGINE_KEYS[ENGINE_KEY_U].downed){
+		Audio_playSound("kid-laugh", 1, false, AUDIO_SOUND_TYPE_SFX);
+		Audio_playSound("crow-call", 1, false, AUDIO_SOUND_TYPE_SFX);
+		//Audio_playSound("enemies-west", 1, false, AUDIO_SOUND_TYPE_SFX);
 	}
 
 	Vec2f_add(&player.velocity, getMulVec2fFloat(player.acceleration, deltaTime));
